@@ -28,8 +28,8 @@ public class ItemEntity {
     @Column(nullable = false)
     private Date createDate;
 
-    @Column(nullable = false)
-    private int like;
+
+    private int likes;
 
 
     @ManyToOne

@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
+
+    @Query("select itm from items itm " +
+            "where itm.collection.id = ?1")
     List<ItemEntity> findByCollectionId(Long collectionId);
 
     @Query("select itm from items itm " +

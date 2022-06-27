@@ -31,11 +31,6 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    public ApiResponse getAll(){
-        List<CollectionEntity> allCollections = collectionRepository.findAll();
-        return new ApiResponse(1, "Successfully!", allCollections);
-    }
-
 
     public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
@@ -49,17 +44,21 @@ public class CollectionService {
         return new ApiResponse(1, "success", null);
     }
 
+
     public ApiResponse edit(Long collectionId, CollectionRequestDto collectionRequestDto){
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-
         if (!optionalCollection.isPresent()){
             throw new NotFoundException("Collection not found with this Id: " + collectionId);
         }
         CollectionEntity collection = optionalCollection.get();
-        collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
+        collection.setDescription(collectionRequestDto.getDescription());
+        collection.setName(collectionRequestDto.getName());
+        collection.setTopic(collectionRequestDto.getTopic());
+        collection.setImageUrl(collectionRequestDto.getImageUrl());
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
+
 
     public ApiResponse delete(Long collectionId) {
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
@@ -78,9 +77,20 @@ public class CollectionService {
         });
         collectionRepository.deleteById(collectionId);
         return new ApiResponse(1, "success", null);
-
     }
 
+
+
+    public ApiResponse getAll(){
+        List<CollectionEntity> allCollections = collectionRepository.findAll();
+        return new ApiResponse(1, "Successfully!", allCollections);
+    }
+
+
+
+
+
+     /////   FIELD   /////
 
     public ApiResponse addField(Long collectionId, ListFieldRequestDto listFieldRequestDto){
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
@@ -103,6 +113,8 @@ public class CollectionService {
         return new ApiResponse(1, "success", fieldRepository.findByCollectionId(collectionId));
     }
 
+
+    //////   MAIN PAGE  ////////
 
     public ApiResponse getMainPageData(){
         List<CollectionEntity> collectionEntityList = collectionRepository.findTop();

@@ -15,17 +15,7 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
-    @GetMapping("/get_all")
-    public ResponseEntity<?> getAllCollections(){
-        return ResponseEntity.ok(collectionService.getAll());
-    }
-
-    @GetMapping("/get_main_page")
-    public ResponseEntity<?> getTopCollections(){
-        return ResponseEntity.ok(collectionService.getMainPageData());
-    }
-
-
+    // ADD
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("/add/{userId}")
     public ResponseEntity<?> add(
@@ -34,6 +24,7 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.add(userId, collectionRequestDto));
     }
 
+    // EDIT
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PutMapping("/edit/{collectionId}")
     public ResponseEntity<?> edit(
@@ -42,6 +33,7 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.edit(collectionId, collectionRequestDto));
     }
 
+    //DELETE
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @DeleteMapping("/delete/{collectionId}")
     public ResponseEntity<?> delete(
@@ -50,18 +42,36 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.delete(collectionId));
     }
 
+    //GET ALL
+    @GetMapping("/get_all")
+    public ResponseEntity<?> getAllCollections(){
+        return ResponseEntity.ok(collectionService.getAll());
+    }
+
+    //GET MAIN PAGE DATA
+    @GetMapping("/get_main_page")
+    public ResponseEntity<?> getTopCollections(){
+        return ResponseEntity.ok(collectionService.getMainPageData());
+    }
+
+
+    /////  FIELD  /////
+
+    // ADD
+    @PostMapping("add_fields/{collectionId}")
+    public ResponseEntity<?> addFields(
+            @PathVariable(name = "collectionId") Long collectionId,
+            @RequestBody ListFieldRequestDto listFieldRequestDto
+    ){
+        return ResponseEntity.ok(collectionService.addField(collectionId, listFieldRequestDto));
+    }
+
+    // GET
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/get_fields/{collectionId}")
     public ResponseEntity<?> get(@PathVariable(name = "collectionId") Long collectionId){
         return ResponseEntity.ok(collectionService.getFields(collectionId));
     }
 
-    @PostMapping("add_fields/{collectionId}")
-    public ResponseEntity<?> addFields(
-            @PathVariable(name = "collectionId") Long collectionId,
-            @RequestBody ListFieldRequestDto listFieldRequestDto
-            ){
-        return ResponseEntity.ok(collectionService.addField(collectionId, listFieldRequestDto));
-    }
 
 }

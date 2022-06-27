@@ -32,12 +32,10 @@ public class ItemService {
     private final TagRepository tagRepository;
 
     public ApiResponse add(Long collectionId, ListItemFieldRequestDto listItemFieldRequestDto){
-
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
         if (!optionalCollection.isPresent()){
             throw new BadRequestException("collection not found with this Id: " + collectionId);
         }
-
         ItemEntity item = new ItemEntity();
         item.setCollection(optionalCollection.get());
         item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
@@ -84,6 +82,20 @@ public class ItemService {
     }
 
 
+    public ApiResponse edit(Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
+        Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);
+        if (!optionalItem.isPresent()){
+            throw new NotFoundException("Item not found with this Id: " + itemId);
+        }
+        ItemEntity item = optionalItem.get();
+        item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
+        List<TagRequestDto> tagRequestDtos = listItemFieldRequestDto.getTagList();
+
+        return new ApiResponse();
+    }
+
+
+
     public ApiResponse getById(Long collectionId, Long itemId){
         Optional<ItemEntity> optionalItemEntity = itemRepository.findById(itemId);
         if (!optionalItemEntity.isPresent()){
@@ -93,7 +105,6 @@ public class ItemService {
         List<TagEntity> tags = tagRepository.findByItemId(itemId);
         List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
-
         fieldEntityList.forEach(fieldEntity -> {
             Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityId(fieldEntity.getId());
             if (optionalItemField.isPresent()){
@@ -106,6 +117,7 @@ public class ItemService {
         return new ApiResponse(1, "success", itemResponseDto);
     }
 
+
     public ApiResponse getAll(Long collectionId){
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
         if (!optionalCollection.isPresent()) {
@@ -115,15 +127,4 @@ public class ItemService {
         return new ApiResponse(1, "success", itemEntities);
     }
 
-    public ApiResponse edit(Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
-        Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);
-        if (!optionalItem.isPresent()){
-            throw new NotFoundException("Item not found with this Id: " + itemId);
-        }
-        ItemEntity item = optionalItem.get();
-        item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
-        List<TagRequestDto> tagRequestDtos = listItemFieldRequestDto.getTagList();
-
-        return new ApiResponse();
-    }
 }
