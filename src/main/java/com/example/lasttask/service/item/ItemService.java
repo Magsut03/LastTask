@@ -27,8 +27,9 @@ public class ItemService {
 
     private final CollectionRepository collectionRepository;
     private final ItemFieldRepository itemFieldRepository;
-    private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
+    private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
 
     public ApiResponse add(Long collectionId, ListItemFieldRequestDto listItemFieldRequestDto){
@@ -82,17 +83,78 @@ public class ItemService {
     }
 
 
-    public ApiResponse edit(Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
+    public ApiResponse edit(Long collectionId, Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
+
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
+        if (!optionalCollection.isPresent()){
+            throw new BadRequestException("collection not found with this Id: " + collectionId);
+        }
+
         Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);
         if (!optionalItem.isPresent()){
             throw new NotFoundException("Item not found with this Id: " + itemId);
         }
-        ItemEntity item = optionalItem.get();
-        item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
-        List<TagRequestDto> tagRequestDtos = listItemFieldRequestDto.getTagList();
 
-        return new ApiResponse();
+        CollectionEntity collection = optionalCollection.get();
+        ItemEntity item = optionalItem.get();
+
+        item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
+        tagRepository.deleteAllByItemId(itemId);
+        List<TagRequestDto> tagRequestDtos = listItemFieldRequestDto.getTagList();
+        tagRequestDtos.forEach(tagRequestDto -> {
+            TagEntity tag = new TagEntity();
+            tag.setName(tagRequestDto.getName());
+            tag.setItem(item);
+            tagRepository.save(tag);
+        });
+
+        List<FieldEntity> fieldEntities = fieldRepository.findByCollectionId(collectionId);
+        for (int i = 0; i < fieldEntities.size(); i++){
+            FieldEntity fieldEntity = fieldEntities.get(i);
+            ItemFieldRequestDto itemFieldRequestDto = listItemFieldRequestDto.getFieldList().get(i + 1);
+            Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityId(fieldEntity.getId());
+            if (!optionalItemField.isPresent()){
+                throw new NotFoundException("Item Field not found with this Id: " + fieldEntity.getId());
+            }
+            ItemFieldEntity itemFieldEntity = optionalItemField.get();
+            switch (fieldEntity.getType()){
+                case 0:{
+                    itemFieldEntity.setType0((Long) itemFieldRequestDto.getItemField());
+                    break;
+                }
+                case 1:{
+                    itemFieldEntity.setType1((String) itemFieldRequestDto.getItemField());
+                    break;
+                }
+                case 2:{
+                    itemFieldEntity.setType2((Boolean) itemFieldRequestDto.getItemField());
+                    break;
+                }
+                case 3:{
+                    itemFieldEntity.setType3((Date) itemFieldRequestDto.getItemField());
+                    break;
+                }
+            }
+            itemFieldRepository.save(itemFieldEntity);
+        }
+        return new ApiResponse(1, "success", null);
     }
+
+
+
+    public ApiResponse delete(Long itemId) {
+        Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);
+        if (!optionalItem.isPresent()){
+            throw new NotFoundException("Item not found with this Id: " + itemId);
+        }
+
+        tagRepository.deleteAllByItemId(itemId);
+        itemFieldRepository.deleteAllByItemId(itemId);
+        commentRepository.deleteAllByItemId(itemId);
+        itemRepository.deleteById(itemId);
+        return new ApiResponse(1, "success", null);
+    }
+
 
 
 
@@ -116,6 +178,7 @@ public class ItemService {
         ItemResponseDto itemResponseDto = new ItemResponseDto(item, tags, itemFieldEntityList, fieldEntityList);
         return new ApiResponse(1, "success", itemResponseDto);
     }
+
 
 
     public ApiResponse getAll(Long collectionId){

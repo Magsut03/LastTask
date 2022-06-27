@@ -72,7 +72,7 @@ public class CollectionService {
             fieldRepository.deleteById(fieldEntity.getId());
         });
         itemEntityList.forEach(itemEntity -> {
-            commentRepository.deleteByItemId(itemEntity.getId());
+            commentRepository.deleteAllByItemId(itemEntity.getId());
             itemRepository.deleteById(itemEntity.getId());
         });
         collectionRepository.deleteById(collectionId);

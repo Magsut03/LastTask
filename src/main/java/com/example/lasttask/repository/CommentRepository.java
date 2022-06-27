@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-    @Query(value = "delete from comment where comment.item_id = ?1", nativeQuery = true)
-    void deleteByItemId(Long itemId);
+    void deleteAllByItemId(Long itemId);
 
 }

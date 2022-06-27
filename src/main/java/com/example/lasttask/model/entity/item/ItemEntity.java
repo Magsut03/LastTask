@@ -28,7 +28,6 @@ public class ItemEntity {
     @Column(nullable = false)
     private Date createDate;
 
-
     private int likes;
 
 

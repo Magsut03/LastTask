@@ -1,6 +1,7 @@
 package com.example.lasttask.controller;
 
 import com.example.lasttask.dto.request.item.ListItemFieldRequestDto;
+import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.service.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,22 @@ public class ItemController{
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/edit/{itemId}")
+    @PutMapping("/edit/{collectionId}/{itemId}")
     public ResponseEntity<?> edit(
+            @PathVariable(name = "collectionId") Long collectionId,
             @PathVariable(name = "itemId") Long itemId,
             @RequestBody ListItemFieldRequestDto listItemFieldRequestDto
     ){
-        return ResponseEntity.ok(itemService.edit(itemId, listItemFieldRequestDto));
+        return ResponseEntity.ok(itemService.edit(collectionId, itemId, listItemFieldRequestDto));
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @DeleteMapping("/edit/{collectionId}/{itemId}")
+    public ResponseEntity<?> delete(
+            @PathVariable(name = "itemId") Long itemId
+    ){
+        return ResponseEntity.ok(itemService.delete(itemId));
+    }
 
     @GetMapping("/get/{collectionId}/{itemId}")
     public ResponseEntity<?> getById(
@@ -47,6 +56,4 @@ public class ItemController{
     ) {
        return ResponseEntity.ok(itemService.getAll(collectionId));
     }
-
-
 }

@@ -12,4 +12,8 @@ public interface ItemFieldRepository extends JpaRepository<ItemFieldEntity, Long
 
     @Query(value = "delete from item_fields where item_fields.field_entity.id = ?1", nativeQuery = true)
     void deleteByFieldEntityId(Long fieldEntityId);
+
+
+    void deleteAllByItemId(Long itemId);
+
 }

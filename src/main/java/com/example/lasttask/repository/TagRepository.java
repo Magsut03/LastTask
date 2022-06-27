@@ -12,4 +12,7 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>{
             "where t.item.id = ?1 " +
             "order by t.name asc")
     List<TagEntity> findByItemId(Long itemId);
+
+
+    void deleteAllByItemId(Long itemId);
 }
