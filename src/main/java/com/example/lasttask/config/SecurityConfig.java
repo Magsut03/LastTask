@@ -37,6 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .cors()
+                .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authEntryPointJwt)
                 .and()
@@ -54,6 +55,7 @@ public class SecurityConfig {
         return http.build();
      }
 
+//    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration configuration = new CorsConfiguration();
 //        configuration.setAllowedOriginPatterns(new ArrayList<>(Arrays.asList("*")));
