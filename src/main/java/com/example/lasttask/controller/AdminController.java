@@ -14,14 +14,14 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @PostMapping("/change_role/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/change_role/{userId}")
     public ResponseEntity<?> changeRole(@PathVariable(name = "userId") Long userId){
         return ResponseEntity.ok(adminService.changeRole(userId));
     }
 
-    @PostMapping("/change_state")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/change_state")
     public ResponseEntity<?> changeState(@RequestBody ListChangeStateRequestDto changeStateRequestDtos){
         return ResponseEntity.ok(adminService.changeState(changeStateRequestDtos));
     }

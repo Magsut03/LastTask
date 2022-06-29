@@ -57,30 +57,20 @@ public class SecurityConfig {
      }
 
 
-//    public void performSignIn() {
-//
-//        Header headers = new Header();
-//
-//        headers.append('Content-Type', 'application/json');
-//        headers.append('Accept', 'application/json');
-//
-//        headers.append('Access-Control-Allow-Origin', 'http://localhost:3000');
-//        headers.append('Access-Control-Allow-Credentials', 'true');
-//
-//        headers.append('GET', 'POST', 'OPTIONS');
-//
-//        headers.append('Authorization', 'Basic ' + base64.encode(username + ":" + password));
-//
-//        fetch(sign_in, {
-//                //mode: 'no-cors',
-//                credentials: 'include',
-//                method: 'POST',
-//                headers: headers
-//    })
-//    .then(response => response.json())
-//    .then(json => console.log(json))
-//    .catch(error => console.log('Authorization failed : ' + error.message));
-//    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
 
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {

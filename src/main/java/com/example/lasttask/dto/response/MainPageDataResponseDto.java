@@ -1,8 +1,7 @@
 package com.example.lasttask.dto.response;
 
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
-import com.example.lasttask.model.entity.collection.CollectionEntity;
-import com.example.lasttask.model.entity.item.ItemEntity;
+import com.example.lasttask.dto.response.item.ItemResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

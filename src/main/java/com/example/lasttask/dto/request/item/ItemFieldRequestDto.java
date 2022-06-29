@@ -10,5 +10,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemFieldRequestDto {
-    private Object itemField;
+    private Object data;
 }

@@ -2,7 +2,7 @@ package com.example.lasttask.service.user;
 
 
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.dto.response.ItemResponseDto;
+import com.example.lasttask.dto.response.item.ItemResponseDto;
 import com.example.lasttask.dto.response.MainPageDataResponseDto;
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
 import com.example.lasttask.dto.response.user.UserResponseDto;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.OAEPParameterSpec;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

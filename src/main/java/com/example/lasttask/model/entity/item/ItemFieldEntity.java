@@ -20,17 +20,8 @@ public class ItemFieldEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long type0;
-    private String type1;
-    private Boolean type2;
-    private Date type3;
-
-    public ItemFieldEntity(Long type0, String type1, Boolean type2, Date type3) {
-        this.type0 = type0;
-        this.type1 = type1;
-        this.type2 = type2;
-        this.type3 = type3;
-    }
+    @Column(nullable = false)
+    private String data;
 
     @ManyToOne
     @JsonIgnore

@@ -11,7 +11,6 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     List<ItemEntity> findByCollectionId(Long collectionId);
 
-    @Query("select itm from items itm " +
-            "order by itm.createDate asc ")
+    @Query("select itm from items itm")
     List<ItemEntity> findTopByCreateDate();
 }

@@ -1,7 +1,6 @@
 package com.example.lasttask.controller;
 
-import com.example.lasttask.dto.request.item.ListItemFieldRequestDto;
-import com.example.lasttask.dto.request.item.TagRequestDto;
+import com.example.lasttask.dto.request.item.ItemRequestDto;
 import com.example.lasttask.service.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +19,9 @@ public class ItemController{
     public ResponseEntity<?> add(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
-            @RequestBody ListItemFieldRequestDto listItemFieldRequestDto
+            @RequestBody ItemRequestDto itemRequestDto
             ){
-        return ResponseEntity.ok(itemService.add(userId, collectionId, listItemFieldRequestDto));
+        return ResponseEntity.ok(itemService.add(userId, collectionId, itemRequestDto));
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
@@ -31,9 +30,9 @@ public class ItemController{
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
             @PathVariable(name = "itemId") Long itemId,
-            @RequestBody ListItemFieldRequestDto listItemFieldRequestDto
+            @RequestBody ItemRequestDto itemRequestDto
     ){
-        return ResponseEntity.ok(itemService.edit(userId, collectionId, itemId, listItemFieldRequestDto));
+        return ResponseEntity.ok(itemService.edit(userId, collectionId, itemId, itemRequestDto));
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")

@@ -1,5 +1,6 @@
 package com.example.lasttask.repository;
 
+import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.model.entity.TagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,5 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>{
     void deleteAllByItemId(Long itemId);
 
     Optional<TagEntity> findByName(String name);
+
 }

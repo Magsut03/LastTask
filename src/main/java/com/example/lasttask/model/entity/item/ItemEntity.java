@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -27,8 +27,6 @@ public class ItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Date createDate;
 
     private int likes;
 

@@ -1,4 +1,4 @@
-package com.example.lasttask.dto.response;
+package com.example.lasttask.dto.response.item;
 
 import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
