@@ -1,23 +1,24 @@
 package com.example.lasttask.service.collection;
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
-import com.example.lasttask.dto.request.collection.FieldRequestDto;
-import com.example.lasttask.dto.request.collection.ListFieldRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.dto.response.MainPageDataResponseDto;
+import com.example.lasttask.dto.response.collection.CollectionResponseDto;
+import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
+import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
 
 @Service
 @RequiredArgsConstructor
@@ -27,48 +28,80 @@ public class CollectionService {
     private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
+    private final TopicRepository topicRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
 
-    public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
+    private UserEntity checkUserForExist(Long userId){
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()){
+        if (!optionalUser.isPresent()){
             throw new NotFoundException("User not found with this Id: " + userId);
         }
-        UserEntity user = optionalUser.get();
+        return optionalUser.get();
+    }
+
+    private CollectionEntity checkCollectionForExist(Long collectionId){
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
+        if (!optionalCollection.isPresent()){
+            throw new NotFoundException("Collection not found with this Id: " + collectionId);
+        }
+        return optionalCollection.get();
+    }
+
+    private void checkPermission(Long userId, Long collectionId, String custom){
+        UserEntity user = collectionRepository.findById(collectionId).get().getUser();
+        UserEntity user2 = userRepository.findById(userId).get();
+        if (!(user.getId().equals(userId) || user2.getRole().equals(ROLE_ADMIN))){
+            throw new BadRequestException("you don't have permission to " + custom + " this collection!");
+        }
+    }
+
+    private TopicEntity checkTopicForExist(String name){
+        Optional<TopicEntity> optionalTopic = topicRepository.findByName(name);
+        if (!optionalTopic.isPresent()){
+            throw new BadRequestException("Topic not found with this Name: " + name);
+        }
+        return optionalTopic.get();
+    }
+
+
+
+    public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
+        UserEntity user = checkUserForExist(userId);
+        TopicEntity topic = checkTopicForExist(collectionRequestDto.getTopic());
         CollectionEntity collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
+        collection.setTopic(topic);
         collection.setUser(user);
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
 
 
-    public ApiResponse edit(Long collectionId, CollectionRequestDto collectionRequestDto){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new NotFoundException("Collection not found with this Id: " + collectionId);
-        }
-        CollectionEntity collection = optionalCollection.get();
-        collection.setDescription(collectionRequestDto.getDescription());
+    public ApiResponse edit(Long userId, Long collectionId, CollectionRequestDto collectionRequestDto){
+        checkUserForExist(userId);
+        CollectionEntity collection = checkCollectionForExist(collectionId);
+        TopicEntity topic = checkTopicForExist(collectionRequestDto.getTopic());
+        checkPermission(userId, collectionId, "edit");
+
         collection.setName(collectionRequestDto.getName());
-        collection.setTopic(collectionRequestDto.getTopic());
+        collection.setTopic(topic);
+        collection.setDescription(collectionRequestDto.getDescription());
         collection.setImageUrl(collectionRequestDto.getImageUrl());
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
 
 
-    public ApiResponse delete(Long collectionId) {
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new NotFoundException("Collection not found with this Id: " + collectionId);
-        }
+    public ApiResponse delete(Long userId, Long collectionId) {
+        checkUserForExist(userId);
+        checkCollectionForExist(collectionId);
+        checkPermission(userId, collectionId, "delete");
         List<ItemEntity> itemEntityList = itemRepository.findByCollectionId(collectionId);
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {
-            itemFieldRepository.deleteByFieldEntityId(fieldEntity.getId());
+            itemFieldRepository.deleteAllByFieldEntityId(fieldEntity.getId());
             fieldRepository.deleteById(fieldEntity.getId());
         });
         itemEntityList.forEach(itemEntity -> {
@@ -83,57 +116,15 @@ public class CollectionService {
 
     public ApiResponse getAll(){
         List<CollectionEntity> allCollections = collectionRepository.findAll();
-        return new ApiResponse(1, "Successfully!", allCollections);
-    }
-
-
-
-
-
-     /////   FIELD   /////
-
-    public ApiResponse addField(Long collectionId, ListFieldRequestDto listFieldRequestDto){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new NotFoundException("collection not found with this Id: " + collectionId);
-        }
-        CollectionEntity collection = optionalCollection.get();
-        List<FieldRequestDto> fieldRequestDtos = listFieldRequestDto.getList();
-        fieldRequestDtos.forEach(fieldRequestDto -> {
-            FieldEntity fieldEntity = modelMapper.map(fieldRequestDto, FieldEntity.class);
-            fieldEntity.setCollection(collection);
-            fieldEntity.setCreateDate(LocalDateTime.now());
-            fieldRepository.save(fieldEntity);
+        List<CollectionResponseDto> collectionResponseDtos = new ArrayList<>();
+        allCollections.forEach(collectionEntity -> {
+            CollectionResponseDto collectionResponseDto =
+                    modelMapper.map(collectionEntity, CollectionResponseDto.class);
+            collectionResponseDto.setTopic(collectionEntity.getTopic().getName());
+            collectionResponseDtos.add(collectionResponseDto);
         });
-        return new ApiResponse(1, "success", null);
+        return new ApiResponse(1, "Successfully!", collectionResponseDtos);
     }
 
-
-    public ApiResponse getFields(Long collectionId){
-        return new ApiResponse(1, "success", fieldRepository.findByCollectionId(collectionId));
-    }
-
-
-    //////   MAIN PAGE  ////////
-
-    public ApiResponse getMainPageData(){
-        List<CollectionEntity> collectionEntityList = collectionRepository.findTop();
-        List<CollectionEntity> collectionEntities = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            if (i < collectionEntityList.size()){
-                collectionEntities.add(collectionEntityList.get(i));
-            }
-        }
-
-        List<ItemEntity> itemEntityList = itemRepository.findTopByCreateDate();
-        List<ItemEntity> itemEntities = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            if (i < itemEntityList.size()){
-                itemEntities.add(itemEntityList.get(i));
-            }
-        }
-
-        return new ApiResponse(1, "success", new MainPageDataResponseDto(collectionEntities, itemEntities));
-    }
 
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,8 +28,6 @@ public class CollectionEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private String topic;
 
     @Column(nullable = false)
     private String imageUrl;
@@ -39,4 +38,16 @@ public class CollectionEntity {
     @ManyToOne
     @JsonIgnore
     private UserEntity user;
+
+    @ManyToOne
+    private TopicEntity topic;
+
+    @OneToMany
+    @JoinTable(
+            name = "collection_field",
+            joinColumns = @JoinColumn(name = "collection_id"),
+            inverseJoinColumns = @JoinColumn(name = "field_id")
+    )
+    @JsonIgnore
+    private List<FieldEntity> fieldEntityList;
 }

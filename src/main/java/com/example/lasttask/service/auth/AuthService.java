@@ -6,6 +6,7 @@ import com.example.lasttask.dto.response.jwt.JWTokenResponse;
 import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
+import com.example.lasttask.model.enums.RoleEnum;
 import com.example.lasttask.repository.UserRepository;
 import com.example.lasttask.security.provider.JWTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.example.lasttask.model.enums.RoleEnum.ROLE_USER;
 import static com.example.lasttask.model.enums.StateEnum.ACTIVE;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -33,6 +35,7 @@ public class AuthService {
             throw new BadRequestException("User already registered with: " + userRegisterDto.getEmail());
         }
         UserEntity user = modelMapper.map(userRegisterDto, UserEntity.class);
+        user.setRole(ROLE_USER);
         user.setState(ACTIVE);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);

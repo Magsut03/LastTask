@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
 
@@ -12,5 +13,7 @@ public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
             "where f.collection.id = ?1 " +
             "order by f.createDate asc")
     List<FieldEntity> findByCollectionId(Long collectionId);
+
+    Optional<FieldEntity> findByName(String name);
 }
 

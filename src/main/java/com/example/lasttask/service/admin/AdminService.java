@@ -3,12 +3,15 @@ package com.example.lasttask.service.admin;
 import com.example.lasttask.dto.request.user.ChangeStateRequestDto;
 import com.example.lasttask.dto.request.user.ListChangeStateRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
+import com.example.lasttask.dto.response.user.UserResponseDto;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +24,7 @@ import static com.example.lasttask.model.enums.StateEnum.*;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     public ApiResponse changeState(ListChangeStateRequestDto changeStateRequestDtos){
         List<ChangeStateRequestDto> changeStateRequestDtoList = changeStateRequestDtos.getList();
@@ -53,8 +57,12 @@ public class AdminService {
 
 
     public ApiResponse getAllUsers(){
-        List<UserEntity> userEntities = userRepository.findAll();
-        return new ApiResponse(1, "Successfully!", userEntities);
+        List<UserEntity> userEntityList = userRepository.findAll();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        userEntityList.forEach(user -> {
+            userResponseDtos.add(modelMapper.map(user, UserResponseDto.class));
+        });
+        return new ApiResponse(1, "Successfully!", userResponseDtos);
     }
 
 

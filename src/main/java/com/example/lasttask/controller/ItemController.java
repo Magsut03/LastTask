@@ -16,30 +16,34 @@ public class ItemController{
     private final ItemService itemService;
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/add/{collectionId}")
+    @PostMapping("/add/{userId}/{collectionId}")
     public ResponseEntity<?> add(
+            @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
             @RequestBody ListItemFieldRequestDto listItemFieldRequestDto
             ){
-        return ResponseEntity.ok(itemService.add(collectionId, listItemFieldRequestDto));
+        return ResponseEntity.ok(itemService.add(userId, collectionId, listItemFieldRequestDto));
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PutMapping("/edit/{collectionId}/{itemId}")
+    @PostMapping("/edit/{userId}/{collectionId}/{itemId}")
     public ResponseEntity<?> edit(
+            @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
             @PathVariable(name = "itemId") Long itemId,
             @RequestBody ListItemFieldRequestDto listItemFieldRequestDto
     ){
-        return ResponseEntity.ok(itemService.edit(collectionId, itemId, listItemFieldRequestDto));
+        return ResponseEntity.ok(itemService.edit(userId, collectionId, itemId, listItemFieldRequestDto));
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @DeleteMapping("/edit/{collectionId}/{itemId}")
+    @PostMapping("/delete/{userId}/{collectionId}/{itemId}")
     public ResponseEntity<?> delete(
+            @PathVariable(name = "userId") Long userId,
+            @PathVariable(name = "collectionId") Long collectionId,
             @PathVariable(name = "itemId") Long itemId
     ){
-        return ResponseEntity.ok(itemService.delete(itemId));
+        return ResponseEntity.ok(itemService.delete(userId, collectionId, itemId));
     }
 
     @GetMapping("/get/{collectionId}/{itemId}")

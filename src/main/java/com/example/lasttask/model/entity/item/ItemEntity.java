@@ -1,6 +1,7 @@
 package com.example.lasttask.model.entity.item;
 
 
+import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +36,14 @@ public class ItemEntity {
     @ManyToOne
     @JsonIgnore
     private CollectionEntity collection;
+
+    @ManyToMany
+    @JoinTable(
+            name = "item_tag",
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<TagEntity> tagList;
 
 
 }

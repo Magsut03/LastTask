@@ -2,6 +2,8 @@ package com.example.lasttask.config;
 
 import com.example.lasttask.exception.jwt.AuthEntryPointJwt;
 import com.example.lasttask.security.filter.JWTokenFilter;
+import com.nimbusds.jose.Header;
+import com.sun.net.httpserver.Headers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +31,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 )
 public class SecurityConfig {
 
-
     private final JWTokenFilter jwTokenFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
 
@@ -54,6 +55,32 @@ public class SecurityConfig {
                 .addFilterBefore(jwTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
      }
+
+
+//    public void performSignIn() {
+//
+//        Header headers = new Header();
+//
+//        headers.append('Content-Type', 'application/json');
+//        headers.append('Accept', 'application/json');
+//
+//        headers.append('Access-Control-Allow-Origin', 'http://localhost:3000');
+//        headers.append('Access-Control-Allow-Credentials', 'true');
+//
+//        headers.append('GET', 'POST', 'OPTIONS');
+//
+//        headers.append('Authorization', 'Basic ' + base64.encode(username + ":" + password));
+//
+//        fetch(sign_in, {
+//                //mode: 'no-cors',
+//                credentials: 'include',
+//                method: 'POST',
+//                headers: headers
+//    })
+//    .then(response => response.json())
+//    .then(json => console.log(json))
+//    .catch(error => console.log('Authorization failed : ' + error.message));
+//    }
 
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {

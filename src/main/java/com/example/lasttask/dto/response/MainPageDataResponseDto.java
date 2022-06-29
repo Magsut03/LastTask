@@ -1,5 +1,6 @@
 package com.example.lasttask.dto.response;
 
+import com.example.lasttask.dto.response.collection.CollectionResponseDto;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MainPageDataResponseDto {
 
-    private List<CollectionEntity> collectionList;
-    private List<ItemEntity> itemList;
+    private List<CollectionResponseDto> collectionList;
+    private List<ItemResponseDto> itemList;
 
 }

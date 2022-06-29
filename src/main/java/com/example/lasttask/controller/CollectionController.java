@@ -1,8 +1,8 @@
 package com.example.lasttask.controller;
 
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
-import com.example.lasttask.dto.request.collection.ListFieldRequestDto;
 import com.example.lasttask.service.collection.CollectionService;
+import com.example.lasttask.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,52 +26,31 @@ public class CollectionController {
 
     // EDIT
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PutMapping("/edit/{collectionId}")
+    @PostMapping("/edit/{userId}/{collectionId}")
     public ResponseEntity<?> edit(
+            @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
             @RequestBody CollectionRequestDto collectionRequestDto){
-        return ResponseEntity.ok(collectionService.edit(collectionId, collectionRequestDto));
+        return ResponseEntity.ok(collectionService.edit(userId, collectionId, collectionRequestDto));
     }
 
-    //DELETE
+    // DELETE
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @DeleteMapping("/delete/{collectionId}")
+    @PostMapping("/delete/{userId}/{collectionId}")
     public ResponseEntity<?> delete(
+            @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId
     ){
-        return ResponseEntity.ok(collectionService.delete(collectionId));
+        return ResponseEntity.ok(collectionService.delete(userId, collectionId));
     }
 
-    //GET ALL
+    // GET ALL
     @GetMapping("/get_all")
     public ResponseEntity<?> getAllCollections(){
         return ResponseEntity.ok(collectionService.getAll());
     }
 
-    //GET MAIN PAGE DATA
-    @GetMapping("/get_main_page")
-    public ResponseEntity<?> getTopCollections(){
-        return ResponseEntity.ok(collectionService.getMainPageData());
-    }
 
-
-    /////  FIELD  /////
-
-    // ADD
-    @PostMapping("add_fields/{collectionId}")
-    public ResponseEntity<?> addFields(
-            @PathVariable(name = "collectionId") Long collectionId,
-            @RequestBody ListFieldRequestDto listFieldRequestDto
-    ){
-        return ResponseEntity.ok(collectionService.addField(collectionId, listFieldRequestDto));
-    }
-
-    // GET
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @GetMapping("/get_fields/{collectionId}")
-    public ResponseEntity<?> get(@PathVariable(name = "collectionId") Long collectionId){
-        return ResponseEntity.ok(collectionService.getFields(collectionId));
-    }
 
 
 }

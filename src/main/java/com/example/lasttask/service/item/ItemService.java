@@ -5,9 +5,11 @@ import com.example.lasttask.dto.request.item.ListItemFieldRequestDto;
 import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.ItemResponseDto;
+import com.example.lasttask.dto.response.user.UserResponseDto;
 import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.TagEntity;
+import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
@@ -16,10 +18,9 @@ import com.example.lasttask.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
 
 @Service
 @RequiredArgsConstructor
@@ -29,25 +30,47 @@ public class ItemService {
     private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
+    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
 
-    public ApiResponse add(Long collectionId, ListItemFieldRequestDto listItemFieldRequestDto){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new BadRequestException("collection not found with this Id: " + collectionId);
+    private UserEntity chekUserForExist(Long userId){
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()){
+            throw new NotFoundException("User not found with this Id: " + userId);
         }
+        return optionalUser.get();
+    }
+
+    private CollectionEntity chekcCollectionForExist(Long collectionId){
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
+        if (optionalCollection.isPresent()){
+            throw new NotFoundException("Collection not found with this Id: " + collectionId);
+        }
+        return optionalCollection.get();
+    }
+
+    private void checkPermission(Long userId, Long collectionId, String custom){
+        UserEntity user = collectionRepository.findById(collectionId).get().getUser();
+        if (user.getId().equals(userId) || user.getRole().equals(ROLE_ADMIN)){
+            throw new BadRequestException("you don't have permission to " + custom + " this collection!");
+        }
+    }
+
+
+    public ApiResponse add(Long userId, Long collectionId, ListItemFieldRequestDto listItemFieldRequestDto){
+
+        CollectionEntity collection = chekcCollectionForExist(collectionId);
         ItemEntity item = new ItemEntity();
-        item.setCollection(optionalCollection.get());
+        item.setCollection(collection);
         item.setName((String) listItemFieldRequestDto.getFieldList().get(0).getItemField());
         List<TagRequestDto> tagRequestDtos = listItemFieldRequestDto.getTagList();
         tagRequestDtos.forEach(tagRequestDto -> {
             TagEntity tag = new TagEntity();
             tag.setName(tagRequestDto.getName());
-            tag.setItem(item);
+//            tag.setItem(item);
             tagRepository.save(tag);
         });
-        CollectionEntity collection = optionalCollection.get();
         collection.setNumberOfItem(collection.getNumberOfItem() + 1);
         collectionRepository.save(collection);
         itemRepository.save(item);
@@ -83,7 +106,8 @@ public class ItemService {
     }
 
 
-    public ApiResponse edit(Long collectionId, Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
+
+    public ApiResponse edit(Long userId, Long collectionId, Long itemId, ListItemFieldRequestDto listItemFieldRequestDto){
 
         Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
         if (!optionalCollection.isPresent()){
@@ -104,7 +128,7 @@ public class ItemService {
         tagRequestDtos.forEach(tagRequestDto -> {
             TagEntity tag = new TagEntity();
             tag.setName(tagRequestDto.getName());
-            tag.setItem(item);
+//            tag.setItem(item);
             tagRepository.save(tag);
         });
 
@@ -142,7 +166,7 @@ public class ItemService {
 
 
 
-    public ApiResponse delete(Long itemId) {
+    public ApiResponse delete(Long userId, Long collectionId, Long itemId) {
         Optional<ItemEntity> optionalItem = itemRepository.findById(itemId);
         if (!optionalItem.isPresent()){
             throw new NotFoundException("Item not found with this Id: " + itemId);

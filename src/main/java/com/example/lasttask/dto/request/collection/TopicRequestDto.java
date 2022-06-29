@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class ListFieldRequestDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TopicRequestDto {
 
-    private List<FieldRequestDto> list;
+    private String name;
 
 }
