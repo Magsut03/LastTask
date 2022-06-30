@@ -3,6 +3,7 @@ package com.example.lasttask.service.auth;
 import com.example.lasttask.dto.request.user.UserLoginDto;
 import com.example.lasttask.dto.request.user.UserRegisterDto;
 import com.example.lasttask.dto.response.jwt.JWTokenResponse;
+import com.example.lasttask.dto.response.user.UserResponseDto;
 import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
@@ -39,8 +40,9 @@ public class AuthService {
         user.setState(ACTIVE);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        UserResponseDto userResponseDto = modelMapper.map(user, UserResponseDto.class);
         String token = jwTokenProvider.generateAccessToken(user);
-        return new JWTokenResponse(OK.value(), OK.name(), token);
+        return new JWTokenResponse(OK.value(), OK.name(), token, userResponseDto);
     }
 
     public JWTokenResponse login(UserLoginDto userLoginDto){
@@ -52,7 +54,8 @@ public class AuthService {
         if (passwordEncoder.matches(user.getPassword(), userLoginDto.getPassword())){
             throw new BadRequestException("wrong password!");
         }
+        UserResponseDto userResponseDto = modelMapper.map(user, UserResponseDto.class);
         String token = jwTokenProvider.generateAccessToken(user);
-        return new JWTokenResponse(OK.value(), OK.name(), token);
+        return new JWTokenResponse(OK.value(), OK.name(), token, userResponseDto);
     }
 }
