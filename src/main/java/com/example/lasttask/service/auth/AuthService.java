@@ -40,9 +40,8 @@ public class AuthService {
         user.setState(ACTIVE);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        UserResponseDto userResponseDto = modelMapper.map(user, UserResponseDto.class);
         String token = jwTokenProvider.generateAccessToken(user);
-        return new JWTokenResponse(OK.value(), OK.name(), token, userResponseDto);
+        return new JWTokenResponse(OK.value(), OK.name(), token);
     }
 
     public JWTokenResponse login(UserLoginDto userLoginDto){
@@ -54,8 +53,7 @@ public class AuthService {
         if (passwordEncoder.matches(user.getPassword(), userLoginDto.getPassword())){
             throw new BadRequestException("wrong password!");
         }
-        UserResponseDto userResponseDto = modelMapper.map(user, UserResponseDto.class);
         String token = jwTokenProvider.generateAccessToken(user);
-        return new JWTokenResponse(OK.value(), OK.name(), token, userResponseDto);
+        return new JWTokenResponse(OK.value(), OK.name(), token);
     }
 }

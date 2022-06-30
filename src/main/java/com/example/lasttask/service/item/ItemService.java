@@ -150,7 +150,7 @@ public class ItemService {
         checkPermission(userId, collectionId, "delete");
         checkItemForExist(itemId);
 
-        tagRepository.deleteAllByItemId(itemId);
+        itemRepository.deleteAllByItemId(itemId);
         itemFieldRepository.deleteAllByItemId(itemId);
         commentRepository.deleteAllByItemId(itemId);
         itemRepository.deleteById(itemId);
@@ -166,7 +166,7 @@ public class ItemService {
             throw new BadRequestException("item not found with this Id: " + itemId);
         }
         ItemEntity item = optionalItemEntity.get();
-        List<TagEntity> tags = tagRepository.findByItemId(itemId);
+        List<TagEntity> tags = item.getTagList();
         List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {

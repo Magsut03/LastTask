@@ -15,5 +15,4 @@ public class JWTokenResponse {
     private int statusCode;
     private String message;
     private String accessToken;
-    private UserResponseDto userResponseDto;
 }

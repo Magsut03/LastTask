@@ -41,6 +41,7 @@ public class ItemEntity {
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @JsonIgnore
     private List<TagEntity> tagList;
 
 

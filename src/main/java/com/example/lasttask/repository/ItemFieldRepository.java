@@ -13,6 +13,8 @@ public interface ItemFieldRepository extends JpaRepository<ItemFieldEntity, Long
     void deleteAllByFieldEntityId(Long fieldEntityId);
 
 
+    @Query(value = "delete from item_fields it " +
+            "where it.item_id = ?1", nativeQuery = true)
     void deleteAllByItemId(Long itemId);
 
 }

@@ -17,10 +17,6 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>{
     List<TagEntity> findByItemId(Long itemId);
 
 
-    @Query(value = "delete from tag t " +
-            "inner join tag_item ti on ti.tag_id = t.id " +
-            "where ti.item_id = ?1 ", nativeQuery = true)
-    void deleteAllByItemId(Long itemId);
 
     Optional<TagEntity> findByName(String name);
 

@@ -20,7 +20,7 @@ public class JWTokenProvider {
   private  String jwtAccessSecret;
 
   @Value("${jwt.secret.expiration.access}")
-  private int accessTokenExpiration;
+  private long accessTokenExpiration;
 
 
   public String generateAccessToken(UserEntity user) {

@@ -13,4 +13,9 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     @Query("select itm from items itm")
     List<ItemEntity> findTopByCreateDate();
+
+    @Query(value = "delete from item_tag it " +
+            "where it.item_id = ?1 ", nativeQuery = true)
+    void deleteAllByItemId(Long itemId);
+
 }

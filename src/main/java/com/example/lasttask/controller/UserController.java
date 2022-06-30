@@ -17,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/get/{email}")
     public ResponseEntity<?> get(
             @PathVariable(name = "email") String email
