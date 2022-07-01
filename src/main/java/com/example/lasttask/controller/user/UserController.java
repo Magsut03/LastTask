@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.user;
 
 import com.example.lasttask.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ public class UserController {
     private final UserService userService;
 
 
-//    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/get/{email}")
     public ResponseEntity<?> get(
             @PathVariable(name = "email") String email
@@ -25,6 +24,11 @@ public class UserController {
         return ResponseEntity.ok(userService.get(email));
     }
 
+
+    @GetMapping("/get_all_users")
+    public ResponseEntity<?> getAll(){
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 
 
 

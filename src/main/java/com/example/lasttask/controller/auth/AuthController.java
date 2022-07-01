@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.auth;
 
 
 import com.example.lasttask.dto.request.user.UserLoginDto;

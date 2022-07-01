@@ -2,9 +2,9 @@ package com.example.lasttask.service.item;
 
 import com.example.lasttask.dto.request.item.ItemFieldRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
-import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.dto.response.item.ItemResponseDto;
+import com.example.lasttask.dto.response.item.ItemsResponseDto;
+import com.example.lasttask.dto.response.item.SingleItemResponseDto;
 import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.TagEntity;
@@ -15,11 +15,9 @@ import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.example.lasttask.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.tags.form.TagWriter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
@@ -35,6 +33,7 @@ public class ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
+    private final ModelMapper modelMapper;
 
     private ItemEntity checkItemForExist(Long id){
         Optional<ItemEntity> optionalItem = itemRepository.findById(id);
@@ -150,9 +149,9 @@ public class ItemService {
         checkPermission(userId, collectionId, "delete");
         checkItemForExist(itemId);
 
-        itemRepository.deleteAllByItemId(itemId);
         itemFieldRepository.deleteAllByItemId(itemId);
         commentRepository.deleteAllByItemId(itemId);
+        tagRepository.deleteAllByItemId(itemId);
         itemRepository.deleteById(itemId);
         return new ApiResponse(1, "success", null);
     }
@@ -177,8 +176,8 @@ public class ItemService {
               itemFieldEntityList.add(new ItemFieldEntity(null, null, null, null));
             }
         });
-        ItemResponseDto itemResponseDto = new ItemResponseDto(item, tags, itemFieldEntityList, fieldEntityList);
-        return new ApiResponse(1, "success", itemResponseDto);
+        SingleItemResponseDto singleItemResponseDto = new SingleItemResponseDto(item, tags, itemFieldEntityList, fieldEntityList);
+        return new ApiResponse(1, "success", singleItemResponseDto);
     }
 
 
@@ -189,7 +188,11 @@ public class ItemService {
             throw new BadRequestException("collection not found with this Id: " + collectionId);
         }
         List<ItemEntity> itemEntities = itemRepository.findByCollectionId(collectionId);
-        return new ApiResponse(1, "success", itemEntities);
+        List<ItemsResponseDto> itemsResponseDtoList = new ArrayList<>();
+        itemEntities.forEach(itemEntity -> {
+            itemsResponseDtoList.add(modelMapper.map(itemEntity, ItemsResponseDto.class));
+        });
+        return new ApiResponse(1, "success", itemsResponseDtoList);
     }
 
 }

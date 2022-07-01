@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.collection;
 
 import com.example.lasttask.dto.request.collection.TopicRequestDto;
 import com.example.lasttask.service.collection.TopicService;
@@ -37,7 +37,6 @@ public class TopicController {
         return ResponseEntity.ok(topicService.delete(topicId));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/get_all")
     public ResponseEntity<?> getAll(){
         return ResponseEntity.ok(topicService.getAll());

@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.item;
 
 import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.service.item.TagService;

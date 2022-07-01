@@ -1,7 +1,7 @@
 package com.example.lasttask.dto.response;
 
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
-import com.example.lasttask.dto.response.item.ItemResponseDto;
+import com.example.lasttask.dto.response.item.SingleItemResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +16,6 @@ import java.util.List;
 public class MainPageDataResponseDto {
 
     private List<CollectionResponseDto> collectionList;
-    private List<ItemResponseDto> itemList;
+    private List<SingleItemResponseDto> itemList;
 
 }

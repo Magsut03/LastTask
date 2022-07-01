@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.collection;
 
 import com.example.lasttask.dto.request.collection.FieldRequestDto;
 import com.example.lasttask.service.collection.FieldService;

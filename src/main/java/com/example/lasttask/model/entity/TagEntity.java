@@ -22,4 +22,16 @@ public class TagEntity {
 
     @Column(nullable = false)
     private String name;
+
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {
+                    CascadeType.MERGE,
+                    CascadeType.REMOVE
+            },
+            mappedBy = "tagList"
+    )
+    @JsonIgnore
+    private List<ItemEntity> itemEntityList;
+
 }

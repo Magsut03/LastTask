@@ -98,10 +98,12 @@ public class CollectionService {
         checkUserForExist(userId);
         checkCollectionForExist(collectionId);
         checkPermission(userId, collectionId, "delete");
+
         List<ItemEntity> itemEntityList = itemRepository.findByCollectionId(collectionId);
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {
-            itemFieldRepository.deleteAllByFieldEntityId(fieldEntity.getId());
+            itemFieldRepository.deleteAllByFieldId(fieldEntity.getId());
+            collectionRepository.deleteAllFields(fieldEntity.getId());
             fieldRepository.deleteById(fieldEntity.getId());
         });
         itemEntityList.forEach(itemEntity -> {
@@ -126,5 +128,17 @@ public class CollectionService {
         return new ApiResponse(1, "Successfully!", collectionResponseDtos);
     }
 
+
+    public ApiResponse getUserCollections(Long userId){
+
+        checkUserForExist(userId);
+
+        List<CollectionEntity> collectionEntityList = collectionRepository.findAllUserId(userId);
+        List<CollectionResponseDto> collectionResponseDtoList = new ArrayList<>();
+        collectionEntityList.forEach(collectionEntity -> {
+            collectionResponseDtoList.add(modelMapper.map(collectionEntity, CollectionResponseDto.class));
+        });
+        return new ApiResponse(1, "success", collectionResponseDtoList);
+    }
 
 }

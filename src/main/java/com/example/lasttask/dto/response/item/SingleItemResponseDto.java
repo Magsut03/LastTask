@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemResponseDto {
+public class SingleItemResponseDto {
     private ItemEntity item;
     private List<TagEntity> tags;
     private List<ItemFieldEntity> itemFields;

@@ -3,11 +3,9 @@ package com.example.lasttask.service.auth;
 import com.example.lasttask.dto.request.user.UserLoginDto;
 import com.example.lasttask.dto.request.user.UserRegisterDto;
 import com.example.lasttask.dto.response.jwt.JWTokenResponse;
-import com.example.lasttask.dto.response.user.UserResponseDto;
 import com.example.lasttask.exception.BadRequestException;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
-import com.example.lasttask.model.enums.RoleEnum;
 import com.example.lasttask.repository.UserRepository;
 import com.example.lasttask.security.provider.JWTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import java.util.Optional;
 
 import static com.example.lasttask.model.enums.RoleEnum.ROLE_USER;
 import static com.example.lasttask.model.enums.StateEnum.ACTIVE;
+import static com.example.lasttask.model.enums.StateEnum.DELETED;
 import static org.springframework.http.HttpStatus.OK;
 
 @Service
@@ -33,7 +32,7 @@ public class AuthService {
 
     public JWTokenResponse register(UserRegisterDto userRegisterDto){
         if (userRepository.findByEmail(userRegisterDto.getEmail()).isPresent()){
-            throw new BadRequestException("User already registered with: " + userRegisterDto.getEmail());
+            throw new BadRequestException("User already registered with Email: " + userRegisterDto.getEmail());
         }
         UserEntity user = modelMapper.map(userRegisterDto, UserEntity.class);
         user.setRole(ROLE_USER);
@@ -47,11 +46,15 @@ public class AuthService {
     public JWTokenResponse login(UserLoginDto userLoginDto){
         Optional<UserEntity> OpUser = userRepository.findByEmail(userLoginDto.getEmail());
         if (!OpUser.isPresent()){
-            throw new NotFoundException("user not found with this email: " + userLoginDto.getEmail());
+            throw new NotFoundException("user not found with this Email: " + userLoginDto.getEmail());
         }
         UserEntity user = OpUser.get();
         if (passwordEncoder.matches(user.getPassword(), userLoginDto.getPassword())){
             throw new BadRequestException("wrong password!");
+        }
+
+        if (user.getState().equals(DELETED)){
+            throw new BadRequestException(user.getEmail() + " - email was blocked");
         }
         String token = jwTokenProvider.generateAccessToken(user);
         return new JWTokenResponse(OK.value(), OK.name(), token);

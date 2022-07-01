@@ -2,7 +2,7 @@ package com.example.lasttask.service.user;
 
 
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.dto.response.item.ItemResponseDto;
+import com.example.lasttask.dto.response.item.SingleItemResponseDto;
 import com.example.lasttask.dto.response.MainPageDataResponseDto;
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
 import com.example.lasttask.dto.response.user.UserResponseDto;
@@ -40,13 +40,13 @@ public class UserService {
             }
         }
         List<ItemEntity> itemEntityList = itemRepository.findTopByCreateDate();
-        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
+        List<SingleItemResponseDto> singleItemResponseDtos = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             if (i < itemEntityList.size()){
-                itemResponseDtos.add(modelMapper.map(itemEntityList.get(i), ItemResponseDto.class));
+                singleItemResponseDtos.add(modelMapper.map(itemEntityList.get(i), SingleItemResponseDto.class));
             }
         }
-        return new ApiResponse(1, "success", new MainPageDataResponseDto(collectionResponseDtos, itemResponseDtos));
+        return new ApiResponse(1, "success", new MainPageDataResponseDto(collectionResponseDtos, singleItemResponseDtos));
     }
 
 
@@ -58,4 +58,14 @@ public class UserService {
         UserResponseDto userResponseDto = modelMapper.map(optionalUser.get(), UserResponseDto.class);
         return new ApiResponse(1, "success", userResponseDto);
     }
+
+    public ApiResponse getAllUsers(){
+        List<UserEntity> userEntityList = userRepository.findAll();
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        userEntityList.forEach(user -> {
+            userResponseDtos.add(modelMapper.map(user, UserResponseDto.class));
+        });
+        return new ApiResponse(1, "Successfully!", userResponseDtos);
+    }
+
 }

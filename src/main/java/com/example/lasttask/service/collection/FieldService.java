@@ -92,7 +92,9 @@ public class FieldService {
         checkCollectionForExist(collectionId);
         checkPermission(userId, collectionId, "delete");
         checkFieldForExist(fieldId);
-        itemFieldRepository.deleteAllByFieldEntityId(fieldId);
+
+        collectionRepository.deleteAllFields(fieldId);
+        itemFieldRepository.deleteAllByFieldId(fieldId);
         fieldRepository.deleteById(fieldId);
         return new ApiResponse(1, "success", null);
     }

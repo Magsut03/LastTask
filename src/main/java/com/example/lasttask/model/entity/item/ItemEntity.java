@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -35,13 +34,18 @@ public class ItemEntity {
     @JsonIgnore
     private CollectionEntity collection;
 
-    @ManyToMany
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {
+                    CascadeType.MERGE,
+                    CascadeType.REMOVE
+            }
+    )
     @JoinTable(
             name = "item_tag",
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    @JsonIgnore
     private List<TagEntity> tagList;
 
 

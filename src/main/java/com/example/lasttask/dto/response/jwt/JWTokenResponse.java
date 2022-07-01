@@ -1,6 +1,5 @@
 package com.example.lasttask.dto.response.jwt;
 
-import com.example.lasttask.dto.response.user.UserResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

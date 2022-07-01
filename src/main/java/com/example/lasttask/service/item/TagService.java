@@ -60,16 +60,8 @@ public class TagService {
 
     public ApiResponse delete(Long tagId){
         checkForExist(tagId);
-//        List<ItemEntity> itemEntityList = tagRepository.findById(tagId).get().getItemEntityList();
-//        itemEntityList.forEach(itemEntity -> {
-//            for (int i = 0; i < itemEntity.getTagList().size(); i++)  {
-//                TagEntity tagEntity = itemEntity.getTagList().get(i);
-//                if (tagEntity.getId().equals(tagId)){
-//                    itemEntity.getTagList().remove(i);
-//                    break;
-//                }
-//            }
-//        });
+
+        tagRepository.deleteAllByTagId(tagId);
         tagRepository.deleteById(tagId);
         return new ApiResponse(1, "success", null);
     }

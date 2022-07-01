@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CollectionRequestDto {
-    private String name;
     private String topic;
+    private String name;
     private String description;
     private String imageUrl;
 }

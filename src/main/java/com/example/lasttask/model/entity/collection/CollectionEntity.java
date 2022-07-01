@@ -42,7 +42,13 @@ public class CollectionEntity {
     @ManyToOne
     private TopicEntity topic;
 
-    @OneToMany
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.MERGE,
+                    CascadeType.REMOVE
+            }
+    )
     @JoinTable(
             name = "collection_field",
             joinColumns = @JoinColumn(name = "collection_id"),

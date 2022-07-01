@@ -1,4 +1,4 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.collection;
 
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
 import com.example.lasttask.service.collection.CollectionService;
@@ -21,6 +21,7 @@ public class CollectionController {
     public ResponseEntity<?> add(
             @PathVariable(name = "userId") Long userId,
             @RequestBody CollectionRequestDto collectionRequestDto){
+
         return ResponseEntity.ok(collectionService.add(userId, collectionRequestDto));
     }
 
@@ -50,7 +51,13 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.getAll());
     }
 
-
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping("get/{userId}")
+    public ResponseEntity<?> getUserCollections(
+            @PathVariable(name = "userId") Long userId
+    ){
+        return ResponseEntity.ok(collectionService.getUserCollections(userId));
+    }
 
 
 }

@@ -1,6 +1,6 @@
-package com.example.lasttask.controller;
+package com.example.lasttask.controller.admin;
 
-import com.example.lasttask.dto.request.user.ListChangeStateRequestDto;
+import com.example.lasttask.dto.request.user.ChangeStateRequestDto;
 import com.example.lasttask.service.admin.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +22,10 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/change_state")
-    public ResponseEntity<?> changeState(@RequestBody ListChangeStateRequestDto changeStateRequestDtos){
-        return ResponseEntity.ok(adminService.changeState(changeStateRequestDtos));
+    public ResponseEntity<?> changeState(@RequestBody ChangeStateRequestDto changeStateRequestDto){
+        return ResponseEntity.ok(adminService.changeState(changeStateRequestDto));
     }
 
-    @GetMapping("/get_all_users")
-    public ResponseEntity<?> getAll(){
-        return ResponseEntity.ok(adminService.getAllUsers());
-    }
 
 
 
