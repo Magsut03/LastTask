@@ -34,20 +34,19 @@ public class TopicService {
         }
     }
 
-    private void checkTopicForExist(Long id){
+    private TopicEntity checkTopicForExist(Long id){
         Optional<TopicEntity> optionalTopic = topicRepository.findById(id);
         if (!optionalTopic.isPresent()){
             throw new NotFoundException("Topic not found with this Id: " + id);
         }
+        return optionalTopic.get();
     }
 
-    private void checkTopicFordelete(Long id){
-        List<CollectionEntity> collectionEntityList = collectionRepository.findAll();
-        collectionEntityList.forEach(collectionEntity -> {
-            if (collectionEntity.getTopic().getId().equals(id)){
-                throw new BadRequestException("you can't delete this topic because it is being used with '" + collectionEntity.getName() + "' collection");
-            }
-        });
+    private void checkTopicFordelete(TopicEntity topic){
+        List<CollectionEntity> collectionEntityList = collectionRepository.findByTopicId(topic.getId());
+        if (collectionEntityList.size() > 0){
+            throw new BadRequestException("you can't delete this topic because it is being used with '" + collectionEntityList.get(0).getName() + "' collection");
+        }
     }
 
     public ApiResponse add(TopicRequestDto topicRequestDto){
@@ -58,17 +57,15 @@ public class TopicService {
     }
 
     public ApiResponse edit(Long topicId, TopicRequestDto topicRequestDto) {
-        checkTopicForExist(topicId);
-        checkTopicForNotExist(topicRequestDto.getName());
-        TopicEntity topic = topicRepository.findById(topicId).get();
+        TopicEntity topic = checkTopicForExist(topicId);
         topic.setName(topicRequestDto.getName());
         topicRepository.save(topic);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse delete(Long id){
-        checkTopicForExist(id);
-        checkTopicFordelete(id);
+        TopicEntity topic = checkTopicForExist(id);
+        checkTopicFordelete(topic);
         topicRepository.deleteById(id);
         return new ApiResponse(1, "success", null);
     }

@@ -12,17 +12,19 @@ import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<TagEntity, Long>{
 
+    @Modifying
+    @Transactional
     @Query(value = "select t from tag t " +
-            "inner join tag_item ti on ti.tag_id = t.id " +
-            "where ti.item_id = ?1 " +
+            "inner join item_tag itm on itm.tag_id = t.id " +
+            "where itm.item_id = ?1 " +
             "order by t.name asc", nativeQuery = true)
     List<TagEntity> findByItemId(Long itemId);
 
 
     @Modifying
     @Transactional
-    @Query(value = "delete from item_tag it " +
-            "where it.item_id = ?1 ", nativeQuery = true)
+    @Query(value = "delete from item_tag itm " +
+            "where itm.item_id = ?1 ", nativeQuery = true)
     void deleteAllByItemId(Long itemId);
 
 
@@ -31,7 +33,7 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>{
 
     @Modifying
     @Transactional
-    @Query(value = "delete from item_tag it " +
-            "where it.tag_id = ?1 ", nativeQuery = true)
+    @Query(value = "delete from item_tag itm " +
+            "where itm.tag_id = ?1 ", nativeQuery = true)
     void deleteAllByTagId(Long tagId);
 }

@@ -20,7 +20,7 @@ import java.util.Collections;
 @Getter
 @Setter
 @Entity(name = "users")
-public class    UserEntity implements UserDetails {
+public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

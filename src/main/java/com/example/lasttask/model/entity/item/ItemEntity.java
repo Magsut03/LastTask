@@ -34,19 +34,15 @@ public class ItemEntity {
     @JsonIgnore
     private CollectionEntity collection;
 
-    @ManyToMany(
-            fetch = FetchType.EAGER,
-            cascade = {
-                    CascadeType.MERGE,
-                    CascadeType.REMOVE
-            }
-    )
+
+    @ManyToMany
     @JoinTable(
             name = "item_tag",
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<TagEntity> tagList;
+
 
 
 }

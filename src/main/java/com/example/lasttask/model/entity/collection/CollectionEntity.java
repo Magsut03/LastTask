@@ -2,6 +2,7 @@ package com.example.lasttask.model.entity.collection;
 
 
 import com.example.lasttask.model.entity.UserEntity;
+import com.example.lasttask.model.entity.item.ItemEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,18 +43,4 @@ public class CollectionEntity {
     @ManyToOne
     private TopicEntity topic;
 
-    @OneToMany(
-            fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.MERGE,
-                    CascadeType.REMOVE
-            }
-    )
-    @JoinTable(
-            name = "collection_field",
-            joinColumns = @JoinColumn(name = "collection_id"),
-            inverseJoinColumns = @JoinColumn(name = "field_id")
-    )
-    @JsonIgnore
-    private List<FieldEntity> fieldEntityList;
 }

@@ -17,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 public class SingleItemResponseDto {
     private ItemEntity item;
-    private List<TagEntity> tags;
     private List<ItemFieldEntity> itemFields;
     private List<FieldEntity> fields;
 }

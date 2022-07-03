@@ -21,7 +21,7 @@ public class CommentEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String message;
+    private String text;
 
     @ManyToOne
     @JsonIgnore
@@ -30,6 +30,7 @@ public class CommentEntity {
     @ManyToOne
     @JsonIgnore
     private ItemEntity item;
+
 
 
 }

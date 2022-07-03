@@ -16,13 +16,13 @@ public interface ItemFieldRepository extends JpaRepository<ItemFieldEntity, Long
 
     @Modifying
     @Transactional
-    @Query(value = "delete from item_fields itf " +
-            "where itf.field_entity_id = ?1", nativeQuery = true)
-    void deleteAllByFieldId(Long fieldId);
+    @Query(value = "delete from item_fields itm " +
+            "where itm.field_entity_id = ?1", nativeQuery = true)
+    void deleteAllByFieldEntityId(Long fieldId);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from item_fields itf " +
-            "where itf.item_id = ?1", nativeQuery = true)
+    @Query(value = "delete from item_fields itm " +
+            "where itm.item_id = ?1", nativeQuery = true)
     void deleteAllByItemId(Long itemId);
 }

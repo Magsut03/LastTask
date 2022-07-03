@@ -22,5 +22,4 @@ public class TopicEntity {
 
     @Column(nullable = false)
     private String name;
-
 }

@@ -1,5 +1,6 @@
 package com.example.lasttask.model.entity.collection;
 
+import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

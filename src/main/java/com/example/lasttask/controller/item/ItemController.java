@@ -1,11 +1,15 @@
 package com.example.lasttask.controller.item;
 
+import com.example.lasttask.dto.request.item.IdRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
+import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.service.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,4 +63,13 @@ public class ItemController{
     ) {
        return ResponseEntity.ok(itemService.getAll(collectionId));
     }
+
+    @GetMapping("/get_by_tags")
+    public ResponseEntity<?> getByTags(
+            @RequestBody List<TagRequestDto> tagRequestDtos
+            ) {
+       return ResponseEntity.ok(itemService.getByTags(tagRequestDtos));
+    }
+
+
 }

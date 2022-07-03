@@ -7,6 +7,7 @@ import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
+import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.example.lasttask.model.enums.RoleEnum;
 import com.example.lasttask.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -61,48 +62,43 @@ public class FieldService {
         return optionalField.get();
     }
 
-    private void checkPermission(Long userId, Long collectionId, String custom){
-        UserEntity user = collectionRepository.findById(collectionId).get().getUser();
-        UserEntity user2 = userRepository.findById(userId).get();
-        if (!(user.getId().equals(userId) || user2.getRole().equals(ROLE_ADMIN))){
+    private void checkPermission(Long userId,UserEntity user, CollectionEntity collection, String custom){
+        if (!(collection.getUser().getId().equals(userId) || user.getRole().equals(ROLE_ADMIN))){
             throw new BadRequestException("you don't have permission to " + custom + " this collection!");
         }
     }
 
 
     public ApiResponse add(Long userId, Long collectionId, FieldRequestDto fieldRequestDto){
-        checkUserForExist(userId);
+        UserEntity user = checkUserForExist(userId);
         CollectionEntity collection = checkCollectionForExist(collectionId);
-        checkPermission(userId, collectionId, "add");
+        checkPermission(userId, user, collection, "add");
         checkFieldForNotExist(fieldRequestDto.getName());
 
         FieldEntity fieldEntity = modelMapper.map(fieldRequestDto, FieldEntity.class);
         fieldEntity.setCreateDate(LocalDateTime.now());
         fieldEntity.setCollection(collection);
-        List<FieldEntity> fieldEntityList = collection.getFieldEntityList();
-        fieldEntityList.add(fieldEntity);
-        collection.setFieldEntityList(fieldEntityList);
         fieldRepository.save(fieldEntity);
         return new ApiResponse(1, "success", null);
     }
 
 
     public ApiResponse delete(Long userId, Long collectionId, Long fieldId) {
-        checkUserForExist(userId);
-        checkCollectionForExist(collectionId);
-        checkPermission(userId, collectionId, "delete");
+        UserEntity user = checkUserForExist(userId);
+        CollectionEntity collection = checkCollectionForExist(collectionId);
+        checkPermission(userId, user, collection, "delete");
         checkFieldForExist(fieldId);
 
-        collectionRepository.deleteAllFields(fieldId);
-        itemFieldRepository.deleteAllByFieldId(fieldId);
+        itemFieldRepository.deleteAllByFieldEntityId(fieldId);
         fieldRepository.deleteById(fieldId);
         return new ApiResponse(1, "success", null);
     }
 
+
     public ApiResponse getAll(Long userId, Long collectionId){
-        checkUserForExist(userId);
-        checkCollectionForExist(collectionId);
-        checkPermission(userId, collectionId, "get");
+        UserEntity user = checkUserForExist(userId);
+        CollectionEntity collection = checkCollectionForExist(collectionId);
+        checkPermission(userId, user, collection, "get");
         return new ApiResponse(1, "success", fieldRepository.findByCollectionId(collectionId));
     }
 }

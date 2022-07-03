@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,5 +14,5 @@ public class CollectionRequestDto {
     private String topic;
     private String name;
     private String description;
-    private String imageUrl;
+    private MultipartFile imageFile;
 }

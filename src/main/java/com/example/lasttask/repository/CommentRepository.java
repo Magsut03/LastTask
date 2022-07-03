@@ -17,4 +17,6 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
             "where c.item_id = ?1", nativeQuery = true)
     void deleteAllByItemId(Long itemId);
 
+    List<CommentEntity> findAllByItem_Id(Long itemId);
+
 }

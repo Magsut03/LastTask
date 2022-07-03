@@ -36,7 +36,7 @@ public class TagService {
         }
     }
 
-    private TagEntity checkForExist(Long id){
+    private TagEntity checkTagForExist(Long id){
         Optional<TagEntity> optionalTag = tagRepository.findById(id);
         if (!optionalTag.isPresent()){
             throw new NotFoundException("Tag not found with this Id: " + id);
@@ -52,15 +52,14 @@ public class TagService {
     }
 
     public ApiResponse edit(Long tagId, TagRequestDto tagRequestDto) {
-        TagEntity tag = checkForExist(tagId);
+        TagEntity tag = checkTagForExist(tagId);
         tag.setName(tagRequestDto.getName());
         tagRepository.save(tag);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse delete(Long tagId){
-        checkForExist(tagId);
-
+        checkTagForExist(tagId);
         tagRepository.deleteAllByTagId(tagId);
         tagRepository.deleteById(tagId);
         return new ApiResponse(1, "success", null);

@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.crypto.spec.OAEPParameterSpec;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface CollectionRepository extends JpaRepository<CollectionEntity, Long> {
 
@@ -15,15 +17,8 @@ public interface CollectionRepository extends JpaRepository<CollectionEntity, Lo
             "order by c.numberOfItem asc ")
     List<CollectionEntity> findTop();
 
-    @Modifying
-    @Transactional
-    @Query(value = "select c from collection c " +
-            "where c.user_id = ?1", nativeQuery = true)
-    List<CollectionEntity> findAllUserId(Long userId);
+    List<CollectionEntity> findAllByUserId(Long userId);
 
-    @Modifying
-    @Transactional
-    @Query(value = "delete from collection_field cf " +
-            "where cf.field_id = ?1", nativeQuery = true)
-    void deleteAllFields(Long fieldId);
+
+    List<CollectionEntity> findByTopicId(Long topicId);
 }

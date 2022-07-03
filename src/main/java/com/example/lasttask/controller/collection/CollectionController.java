@@ -59,5 +59,12 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.getUserCollections(userId));
     }
 
+    @GetMapping("/get_by_topic/{topic}")
+    public ResponseEntity<?> getByTopic(
+            @PathVariable(name = "topic") String name
+    ){
+        return ResponseEntity.ok(collectionService.getByTopic(name));
+    }
+
 
 }

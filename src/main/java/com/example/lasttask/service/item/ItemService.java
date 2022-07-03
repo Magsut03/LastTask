@@ -1,7 +1,9 @@
 package com.example.lasttask.service.item;
 
+import com.example.lasttask.dto.request.item.IdRequestDto;
 import com.example.lasttask.dto.request.item.ItemFieldRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
+import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.item.ItemsResponseDto;
 import com.example.lasttask.dto.response.item.SingleItemResponseDto;
@@ -11,6 +13,7 @@ import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
+import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.example.lasttask.repository.*;
@@ -34,6 +37,16 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+
+
+    private TagEntity checkTagForExist(String name){
+        Optional<TagEntity> optionalTag = tagRepository.findByName(name);
+        if (!optionalTag.isPresent()){
+            throw new NotFoundException("Tag not found with this Name: " + name);
+        }
+        return optionalTag.get();
+    }
+
 
     private ItemEntity checkItemForExist(Long id){
         Optional<ItemEntity> optionalItem = itemRepository.findById(id);
@@ -60,33 +73,31 @@ public class ItemService {
         return optionalCollection.get();
     }
 
-    private void checkPermission(Long userId, Long collectionId, String custom){
-        UserEntity user = collectionRepository.findById(collectionId).get().getUser();
-        UserEntity user2 = userRepository.findById(userId).get();
-        if (!(user.getId().equals(userId) || user2.getRole().equals(ROLE_ADMIN))){
+    private void checkPermission(Long userId, UserEntity user, CollectionEntity collection, String custom){
+        if (!(collection.getUser()
+                .getId().equals(userId) || user.getRole().equals(ROLE_ADMIN))){
             throw new BadRequestException("you don't have permission to " + custom + " this collection!");
         }
     }
 
 
+
+
     public ApiResponse add(Long userId, Long collectionId, ItemRequestDto itemRequestDto){
-        checkUserForExist(userId);
+        UserEntity user = checkUserForExist(userId);
         CollectionEntity collection = checkCollectionForExist(collectionId);
-        checkPermission(userId, collectionId, "add");
+        checkPermission(userId, user, collection, "add");
 
         ItemEntity item = new ItemEntity();
-        item.setCollection(collection);
         item.setName((String) itemRequestDto.getFieldList().get(0).getData());
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            Optional<TagEntity> optionalTag = tagRepository.findByName(tagRequestDto.getName());
-            if (!optionalTag.isPresent()){
-                throw new BadRequestException("Tag not found with this Name: " + tagRequestDto.getName());
-            }
-            tagList.add(optionalTag.get());
+            TagEntity tag = checkTagForExist(tagRequestDto.getName());
+            tagList.add(tag);
         });
         item.setTagList(tagList);
         collection.setNumberOfItem(collection.getNumberOfItem() + 1);
+        item.setCollection(collection);
         collectionRepository.save(collection);
         itemRepository.save(item);
 
@@ -106,8 +117,7 @@ public class ItemService {
 
 
     public ApiResponse edit(Long userId, Long collectionId, Long itemId, ItemRequestDto itemRequestDto){
-
-        CollectionEntity collection = checkCollectionForExist(collectionId);
+        checkCollectionForExist(collectionId);
         checkUserForExist(userId);
         ItemEntity item = checkItemForExist(itemId);
 
@@ -115,11 +125,8 @@ public class ItemService {
 
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            Optional<TagEntity> optionalTag = tagRepository.findByName(tagRequestDto.getName());
-            if (!optionalTag.isPresent()){
-                throw new BadRequestException("Tag not found with this Name: " + tagRequestDto.getName());
-            }
-            tagList.add(optionalTag.get());
+            TagEntity tag = checkTagForExist(tagRequestDto.getName());
+            tagList.add(tag);
         });
         item.setTagList(tagList);
 
@@ -130,11 +137,14 @@ public class ItemService {
             ItemFieldRequestDto itemFieldRequestDto = itemRequestDto.getFieldList().get(i + 1);
 
             Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityId(fieldEntity.getId());
+            ItemFieldEntity itemFieldEntity;
             if (!optionalItemField.isPresent()){
-                throw new NotFoundException("Item Field not found with this Id: " + fieldEntity.getId());
+                itemFieldEntity = new ItemFieldEntity();
+                itemFieldEntity.setItem(item);
+                itemFieldEntity.setFieldEntity(fieldEntity);
+            } else {
+                itemFieldEntity = optionalItemField.get();
             }
-
-            ItemFieldEntity itemFieldEntity = optionalItemField.get();
             itemFieldEntity.setData((String) itemFieldRequestDto.getData());
             itemFieldRepository.save(itemFieldEntity);
         }
@@ -144,14 +154,16 @@ public class ItemService {
 
 
     public ApiResponse delete(Long userId, Long collectionId, Long itemId) {
-        checkUserForExist(userId);
-        checkCollectionForExist(collectionId);
-        checkPermission(userId, collectionId, "delete");
+        UserEntity user = checkUserForExist(userId);
+        CollectionEntity collection = checkCollectionForExist(collectionId);
+        checkPermission(userId, user, collection, "delete");
         checkItemForExist(itemId);
+        collection.setNumberOfItem(collection.getNumberOfItem() - 1);
+        collectionRepository.save(collection);
 
-        itemFieldRepository.deleteAllByItemId(itemId);
         commentRepository.deleteAllByItemId(itemId);
         tagRepository.deleteAllByItemId(itemId);
+        itemFieldRepository.deleteAllByItemId(itemId);
         itemRepository.deleteById(itemId);
         return new ApiResponse(1, "success", null);
     }
@@ -160,12 +172,8 @@ public class ItemService {
 
 
     public ApiResponse getById(Long collectionId, Long itemId){
-        Optional<ItemEntity> optionalItemEntity = itemRepository.findById(itemId);
-        if (!optionalItemEntity.isPresent()){
-            throw new BadRequestException("item not found with this Id: " + itemId);
-        }
-        ItemEntity item = optionalItemEntity.get();
-        List<TagEntity> tags = item.getTagList();
+        checkCollectionForExist(collectionId);
+        ItemEntity item = checkItemForExist(itemId);
         List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {
@@ -176,17 +184,12 @@ public class ItemService {
               itemFieldEntityList.add(new ItemFieldEntity(null, null, null, null));
             }
         });
-        SingleItemResponseDto singleItemResponseDto = new SingleItemResponseDto(item, tags, itemFieldEntityList, fieldEntityList);
+        SingleItemResponseDto singleItemResponseDto = new SingleItemResponseDto(item, itemFieldEntityList, fieldEntityList);
         return new ApiResponse(1, "success", singleItemResponseDto);
     }
 
-
-
     public ApiResponse getAll(Long collectionId){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()) {
-            throw new BadRequestException("collection not found with this Id: " + collectionId);
-        }
+        checkCollectionForExist(collectionId);
         List<ItemEntity> itemEntities = itemRepository.findByCollectionId(collectionId);
         List<ItemsResponseDto> itemsResponseDtoList = new ArrayList<>();
         itemEntities.forEach(itemEntity -> {
@@ -195,4 +198,33 @@ public class ItemService {
         return new ApiResponse(1, "success", itemsResponseDtoList);
     }
 
+
+    public ApiResponse getByTags(List<TagRequestDto> tagRequestDtos) {
+        List<ItemEntity> itemEntities = itemRepository.findAll();
+        List<Long> tagIdList = new ArrayList<>();
+        tagRequestDtos.forEach(idRequestDto -> {
+            TagEntity tag = checkTagForExist(idRequestDto.getName());
+            tagIdList.add(tag.getId());
+        });
+
+        List<ItemsResponseDto> itemsResponseDtoList = new ArrayList<>();
+
+        for (int i = 0; i < itemEntities.size(); i++){
+            boolean ok = true;
+            for (int j = 0; j < tagIdList.size(); j++){
+                boolean ok2 = false;
+                for (int k =  0; k < itemEntities.get(i).getTagList().size(); k++){
+                    if (tagIdList.get(j).equals(itemEntities.get(i).getTagList().get(k).getId())){
+                        ok2 = true;
+                        break;
+                    }
+                }
+                ok = ok & ok2;
+            }
+            if (ok){
+                itemsResponseDtoList.add(modelMapper.map(itemEntities.get(i), ItemsResponseDto.class));
+            }
+        }
+        return new ApiResponse(1, "success", itemsResponseDtoList);
+    }
 }

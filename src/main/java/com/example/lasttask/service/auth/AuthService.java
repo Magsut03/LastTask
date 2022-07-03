@@ -32,7 +32,7 @@ public class AuthService {
 
     public JWTokenResponse register(UserRegisterDto userRegisterDto){
         if (userRepository.findByEmail(userRegisterDto.getEmail()).isPresent()){
-            throw new BadRequestException("User already registered with Email: " + userRegisterDto.getEmail());
+            throw new BadRequestException("User already registered with this Email: " + userRegisterDto.getEmail());
         }
         UserEntity user = modelMapper.map(userRegisterDto, UserEntity.class);
         user.setRole(ROLE_USER);
