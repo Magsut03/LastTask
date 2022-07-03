@@ -7,7 +7,6 @@ import com.example.lasttask.model.entity.CommentEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
-import com.sun.tools.javac.util.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,13 +17,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final CollectionRepository collectionRepository;
-    private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
-    private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
 
     private ItemEntity checkItemForExist(Long id){
