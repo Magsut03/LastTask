@@ -14,5 +14,5 @@ public class CollectionRequestDto {
     private String topic;
     private String name;
     private String description;
-    private String imageFile;
+    private MultipartFile imageFile;
 }

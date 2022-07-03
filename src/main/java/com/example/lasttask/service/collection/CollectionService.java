@@ -10,10 +10,10 @@ import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
-//import com.google.cloud.storage.Acl;
-//import com.google.cloud.storage.BlobInfo;
-//import com.google.cloud.storage.Storage;
-//import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.Acl;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,27 +42,27 @@ public class CollectionService {
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
 
-//    private static Storage storage = StorageOptions.getDefaultInstance().getService();
-//    @Value("${google.storage.bucket}")
-//    private String bucketName;
-//
-//    private String saveImage(MultipartFile imageFile){
-//        String fileName = System.nanoTime() + imageFile.getOriginalFilename();
-//
-//        try {
-//            BlobInfo blobInfo = storage.create(
-//                    BlobInfo.newBuilder(bucketName, fileName)
-//                            .setContentType(imageFile.getContentType())
-//                            .setAcl(new ArrayList<>(
-//                                    Arrays.asList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))
-//                            )).build(),
-//                    imageFile.getInputStream()
-//            );
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
-//    }
+    private static Storage storage = StorageOptions.getDefaultInstance().getService();
+    @Value("${google.storage.bucket}")
+    private String bucketName;
+
+    private String saveImage(MultipartFile imageFile){
+        String fileName = System.nanoTime() + imageFile.getOriginalFilename();
+
+        try {
+            BlobInfo blobInfo = storage.create(
+                    BlobInfo.newBuilder(bucketName, fileName)
+                            .setContentType(imageFile.getContentType())
+                            .setAcl(new ArrayList<>(
+                                    Arrays.asList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))
+                            )).build(),
+                    imageFile.getInputStream()
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
+    }
 
 
     private UserEntity checkUserForExist(Long userId){
@@ -103,7 +103,7 @@ public class CollectionService {
         TopicEntity topic = checkTopicForExist(collectionRequestDto.getTopic());
         CollectionEntity collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
         collection.setTopic(topic);
-//        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
+        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
         collection.setUser(user);
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
@@ -119,7 +119,7 @@ public class CollectionService {
         collection.setName(collectionRequestDto.getName());
         collection.setTopic(topic);
         collection.setDescription(collectionRequestDto.getDescription());
-//        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
+        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
