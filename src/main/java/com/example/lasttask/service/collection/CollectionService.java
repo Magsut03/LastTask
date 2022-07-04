@@ -10,6 +10,7 @@ import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
+import com.example.lasttask.service.CheckService;
 import com.google.cloud.storage.Acl;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
@@ -41,12 +42,13 @@ public class CollectionService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final CheckService checkService;
 
     private static Storage storage = StorageOptions.getDefaultInstance().getService();
     @Value("${google.storage.bucket}")
     private String bucketName;
 
-    private String saveImage(MultipartFile imageFile){
+    public String saveImage(MultipartFile imageFile){
         String fileName = System.nanoTime() + imageFile.getOriginalFilename();
 
         try {
@@ -64,71 +66,38 @@ public class CollectionService {
         return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
     }
 
-
-    private UserEntity checkUserForExist(Long userId){
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()){
-            throw new NotFoundException("User not found with this Id: " + userId);
-        }
-        return optionalUser.get();
-    }
-
-    private CollectionEntity checkCollectionForExist(Long collectionId){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new NotFoundException("Collection not found with this Id: " + collectionId);
-        }
-        return optionalCollection.get();
-    }
-
-    private void checkPermission(Long userId, UserEntity user, CollectionEntity collection, String custom){
-        if (!(collection.getUser().getId().equals(userId) || user.getRole().equals(ROLE_ADMIN))){
-            throw new BadRequestException("you don't have permission to " + custom + " this collection!");
-        }
-    }
-
-
-    private TopicEntity checkTopicForExist(String  name){
-        Optional<TopicEntity> optionalTopic = topicRepository.findByName(name);
-        if (!optionalTopic.isPresent()){
-            throw new BadRequestException("Topic not found with this Name: " + name);
-        }
-        return optionalTopic.get();
-    }
-
-
-
     public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
-        UserEntity user = checkUserForExist(userId);
-        TopicEntity topic = checkTopicForExist(collectionRequestDto.getTopic());
+        UserEntity user = checkService.checkUserForExist(userId);
+        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopic());
         CollectionEntity collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
         collection.setTopic(topic);
-        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
+        collection.setImageUrl(collectionRequestDto.getImageUrl());
         collection.setUser(user);
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
 
 
+
     public ApiResponse edit(Long userId, Long collectionId, CollectionRequestDto collectionRequestDto){
-        UserEntity user = checkUserForExist(userId);
-        CollectionEntity collection = checkCollectionForExist(collectionId);
-        TopicEntity topic = checkTopicForExist(collectionRequestDto.getTopic());
-        checkPermission(userId, user, collection, "edit");
+        UserEntity user = checkService.checkUserForExist(userId);
+        CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
+        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopic());
+        checkService.checkPermission(userId, user, collection, "edit");
 
         collection.setName(collectionRequestDto.getName());
         collection.setTopic(topic);
         collection.setDescription(collectionRequestDto.getDescription());
-        collection.setImageUrl(saveImage(collectionRequestDto.getImageFile()));
+        collection.setImageUrl(collectionRequestDto.getImageUrl());
         collectionRepository.save(collection);
         return new ApiResponse(1, "success", null);
     }
 
 
     public ApiResponse delete(Long userId, Long collectionId) {
-        UserEntity user = checkUserForExist(userId);
-        CollectionEntity collection = checkCollectionForExist(collectionId);
-        checkPermission(userId, user, collection, "delete");
+        UserEntity user = checkService.checkUserForExist(userId);
+        CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
+        checkService.checkPermission(userId, user, collection, "delete");
 
         List<ItemEntity> itemEntityList = itemRepository.findByCollectionId(collectionId);
         itemEntityList.forEach(itemEntity -> {
@@ -159,7 +128,7 @@ public class CollectionService {
 
 
     public ApiResponse getUserCollections(Long userId){
-        checkUserForExist(userId);
+        checkService.checkUserForExist(userId);
 
         List<CollectionEntity> collectionEntityList = collectionRepository.findAllByUserId(userId);
         List<CollectionResponseDto> collectionResponseDtoList = new ArrayList<>();
@@ -174,7 +143,7 @@ public class CollectionService {
     }
 
     public ApiResponse getByTopic(String name){
-        TopicEntity topic = checkTopicForExist(name);
+        TopicEntity topic = checkService.checkTopicForExist(name);
         List<CollectionEntity> collectionEntityList = collectionRepository.findByTopicId(topic.getId());
         List<CollectionResponseDto> collectionResponseDtoList = new ArrayList<>();
         collectionEntityList.forEach(collection -> {

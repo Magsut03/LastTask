@@ -4,9 +4,11 @@ import com.example.lasttask.dto.request.collection.CollectionRequestDto;
 import com.example.lasttask.service.collection.CollectionService;
 import com.example.lasttask.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,12 +17,23 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PostMapping("/image/save")
+    public ResponseEntity<?> imageSave(
+            @RequestParam(value = "file", required = false) MultipartFile imageFile
+    ){
+        return ResponseEntity.ok(collectionService.saveImage(imageFile));
+    }
+
     // ADD
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("/add/{userId}")
     public ResponseEntity<?> add(
             @PathVariable(name = "userId") Long userId,
-            @RequestBody CollectionRequestDto collectionRequestDto){
+            @RequestBody CollectionRequestDto collectionRequestDto,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile
+    ){
 
         return ResponseEntity.ok(collectionService.add(userId, collectionRequestDto));
     }
@@ -31,7 +44,8 @@ public class CollectionController {
     public ResponseEntity<?> edit(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
-            @RequestBody CollectionRequestDto collectionRequestDto){
+            @RequestBody CollectionRequestDto collectionRequestDto
+    ){
         return ResponseEntity.ok(collectionService.edit(userId, collectionId, collectionRequestDto));
     }
 
