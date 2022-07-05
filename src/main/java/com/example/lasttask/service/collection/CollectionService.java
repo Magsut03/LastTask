@@ -32,8 +32,9 @@ public class CollectionService {
 
     public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
         UserEntity user = checkService.checkUserForExist(userId);
-        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopicId());
-        CollectionEntity collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
+        TopicEntity topic = checkService.checkTopicForExistByName(collectionRequestDto.getTopic());
+        CollectionEntity collection = new CollectionEntity();
+        collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
         collection.setTopic(topic);
         collection.setImageUrl(collectionRequestDto.getImageUrl());
         collection.setUser(user);
@@ -46,7 +47,7 @@ public class CollectionService {
     public ApiResponse edit(Long userId, Long collectionId, CollectionRequestDto collectionRequestDto){
         UserEntity user = checkService.checkUserForExist(userId);
         CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
-        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopicId());
+        TopicEntity topic = checkService.checkTopicForExistByName(collectionRequestDto.getTopic());
         checkService.checkPermission(userId, user, collection, "edit");
 
         collection.setName(collectionRequestDto.getName());

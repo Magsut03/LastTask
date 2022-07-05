@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @Setter
 public class CollectionRequestDto {
-    private Long topicId;
+    private String topic;
     private String name;
     private String description;
     private String imageUrl;

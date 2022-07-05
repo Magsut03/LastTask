@@ -85,6 +85,14 @@ public class CheckService {
 
                     /////////////     TOPIC    ////////////
 
+    public TopicEntity checkTopicForExistByName(String name){
+        Optional<TopicEntity> optionalTopic = topicRepository.findByName(name);
+        if (!optionalTopic.isPresent()){
+            throw new BadRequestException("Topic not found with this Name: " + name);
+        }
+        return optionalTopic.get();
+    }
+
     public TopicEntity checkTopicForExist(Long id){
         Optional<TopicEntity> optionalTopic = topicRepository.findById(id);
         if (!optionalTopic.isPresent()){
