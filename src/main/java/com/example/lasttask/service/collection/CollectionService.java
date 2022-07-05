@@ -68,7 +68,7 @@ public class CollectionService {
 
     public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
         UserEntity user = checkService.checkUserForExist(userId);
-        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopic());
+        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopicId());
         CollectionEntity collection = modelMapper.map(collectionRequestDto, CollectionEntity.class);
         collection.setTopic(topic);
         collection.setImageUrl(collectionRequestDto.getImageUrl());
@@ -82,7 +82,7 @@ public class CollectionService {
     public ApiResponse edit(Long userId, Long collectionId, CollectionRequestDto collectionRequestDto){
         UserEntity user = checkService.checkUserForExist(userId);
         CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
-        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopic());
+        TopicEntity topic = checkService.checkTopicForExist(collectionRequestDto.getTopicId());
         checkService.checkPermission(userId, user, collection, "edit");
 
         collection.setName(collectionRequestDto.getName());
@@ -142,8 +142,8 @@ public class CollectionService {
         return new ApiResponse(1, "success", collectionResponseDtoList);
     }
 
-    public ApiResponse getByTopic(String name){
-        TopicEntity topic = checkService.checkTopicForExist(name);
+    public ApiResponse getByTopic(Long id){
+        TopicEntity topic = checkService.checkTopicForExist(id);
         List<CollectionEntity> collectionEntityList = collectionRepository.findByTopicId(topic.getId());
         List<CollectionResponseDto> collectionResponseDtoList = new ArrayList<>();
         collectionEntityList.forEach(collection -> {

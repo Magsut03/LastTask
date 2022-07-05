@@ -1,8 +1,8 @@
 package com.example.lasttask.service.item;
 
-import com.example.lasttask.dto.request.item.IdRequestDto;
 import com.example.lasttask.dto.request.item.ItemFieldRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
+import com.example.lasttask.dto.request.item.TagIdRequestDto;
 import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.item.ItemsResponseDto;
@@ -13,10 +13,10 @@ import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
-import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.example.lasttask.repository.*;
+import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -37,62 +37,26 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final CheckService checkService;
 
 
-    private TagEntity checkTagForExist(String name){
-        Optional<TagEntity> optionalTag = tagRepository.findByName(name);
-        if (!optionalTag.isPresent()){
-            throw new NotFoundException("Tag not found with this Name: " + name);
-        }
-        return optionalTag.get();
-    }
 
 
-    private ItemEntity checkItemForExist(Long id){
-        Optional<ItemEntity> optionalItem = itemRepository.findById(id);
-        if (!optionalItem.isPresent()){
-            throw new NotFoundException("Item not found with this Id: " + id);
-        }
-        return optionalItem.get();
-    }
 
-
-    private UserEntity checkUserForExist(Long userId){
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()){
-            throw new NotFoundException("User not found with this Id: " + userId);
-        }
-        return optionalUser.get();
-    }
-
-    private CollectionEntity checkCollectionForExist(Long collectionId){
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findById(collectionId);
-        if (!optionalCollection.isPresent()){
-            throw new NotFoundException("Collection not found with this Id: " + collectionId);
-        }
-        return optionalCollection.get();
-    }
-
-    private void checkPermission(Long userId, UserEntity user, CollectionEntity collection, String custom){
-        if (!(collection.getUser()
-                .getId().equals(userId) || user.getRole().equals(ROLE_ADMIN))){
-            throw new BadRequestException("you don't have permission to " + custom + " this collection!");
-        }
-    }
 
 
 
 
     public ApiResponse add(Long userId, Long collectionId, ItemRequestDto itemRequestDto){
-        UserEntity user = checkUserForExist(userId);
-        CollectionEntity collection = checkCollectionForExist(collectionId);
-        checkPermission(userId, user, collection, "add");
+        UserEntity user = checkService.checkUserForExist(userId);
+        CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
+        checkService.checkPermission(userId, user, collection, "add");
 
         ItemEntity item = new ItemEntity();
         item.setName((String) itemRequestDto.getFieldList().get(0).getData());
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            TagEntity tag = checkTagForExist(tagRequestDto.getName());
+            TagEntity tag = checkService.checkTagForExist(tagRequestDto.getId());
             tagList.add(tag);
         });
         item.setTagList(tagList);
@@ -117,15 +81,15 @@ public class ItemService {
 
 
     public ApiResponse edit(Long userId, Long collectionId, Long itemId, ItemRequestDto itemRequestDto){
-        checkCollectionForExist(collectionId);
-        checkUserForExist(userId);
-        ItemEntity item = checkItemForExist(itemId);
+        checkService.checkCollectionForExist(collectionId);
+        checkService.checkUserForExist(userId);
+        ItemEntity item = checkService.checkItemForExist(itemId);
 
         item.setName((String) itemRequestDto.getFieldList().get(0).getData());
 
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            TagEntity tag = checkTagForExist(tagRequestDto.getName());
+            TagEntity tag = checkService.checkTagForExist(tagRequestDto.getId());
             tagList.add(tag);
         });
         item.setTagList(tagList);
@@ -154,10 +118,10 @@ public class ItemService {
 
 
     public ApiResponse delete(Long userId, Long collectionId, Long itemId) {
-        UserEntity user = checkUserForExist(userId);
-        CollectionEntity collection = checkCollectionForExist(collectionId);
-        checkPermission(userId, user, collection, "delete");
-        checkItemForExist(itemId);
+        UserEntity user = checkService.checkUserForExist(userId);
+        CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
+        checkService.checkPermission(userId, user, collection, "delete");
+        checkService.checkItemForExist(itemId);
         collection.setNumberOfItem(collection.getNumberOfItem() - 1);
         collectionRepository.save(collection);
 
@@ -172,8 +136,8 @@ public class ItemService {
 
 
     public ApiResponse getById(Long collectionId, Long itemId){
-        checkCollectionForExist(collectionId);
-        ItemEntity item = checkItemForExist(itemId);
+        checkService.checkCollectionForExist(collectionId);
+        ItemEntity item = checkService.checkItemForExist(itemId);
         List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {
@@ -189,7 +153,7 @@ public class ItemService {
     }
 
     public ApiResponse getAll(Long collectionId){
-        checkCollectionForExist(collectionId);
+        checkService.checkCollectionForExist(collectionId);
         List<ItemEntity> itemEntities = itemRepository.findByCollectionId(collectionId);
         List<ItemsResponseDto> itemsResponseDtoList = new ArrayList<>();
         itemEntities.forEach(itemEntity -> {
@@ -199,11 +163,11 @@ public class ItemService {
     }
 
 
-    public ApiResponse getByTags(List<TagRequestDto> tagRequestDtos) {
+    public ApiResponse getByTags(List<TagIdRequestDto> tagIdRequestDtos) {
         List<ItemEntity> itemEntities = itemRepository.findAll();
         List<Long> tagIdList = new ArrayList<>();
-        tagRequestDtos.forEach(idRequestDto -> {
-            TagEntity tag = checkTagForExist(idRequestDto.getName());
+        tagIdRequestDtos.forEach(idRequestDto -> {
+            TagEntity tag = checkService.checkTagForExist(idRequestDto.getId());
             tagIdList.add(tag.getId());
         });
 

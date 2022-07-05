@@ -7,6 +7,7 @@ import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
+import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -27,39 +28,27 @@ public class TagService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
+    private final CheckService checkService;
 
 
-    private void checkTagForNotExist(String name){
-        Optional<TagEntity> optionalTagEntity = tagRepository.findByName(name);
-        if (optionalTagEntity.isPresent()){
-            throw new BadRequestException("Tag is already exist with this Name: " + name);
-        }
-    }
 
-    private TagEntity checkTagForExist(Long id){
-        Optional<TagEntity> optionalTag = tagRepository.findById(id);
-        if (!optionalTag.isPresent()){
-            throw new NotFoundException("Tag not found with this Id: " + id);
-        }
-        return optionalTag.get();
-    }
 
     public ApiResponse add(TagRequestDto tagRequestDto) {
-        checkTagForNotExist(tagRequestDto.getName());
+        checkService.checkTagForNotExist(tagRequestDto.getName());
         TagEntity tag = modelMapper.map(tagRequestDto, TagEntity.class);
         tagRepository.save(tag);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse edit(Long tagId, TagRequestDto tagRequestDto) {
-        TagEntity tag = checkTagForExist(tagId);
+        TagEntity tag = checkService.checkTagForExist(tagId);
         tag.setName(tagRequestDto.getName());
         tagRepository.save(tag);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse delete(Long tagId){
-        checkTagForExist(tagId);
+        checkService.checkTagForExist(tagId);
         tagRepository.deleteAllByTagId(tagId);
         tagRepository.deleteById(tagId);
         return new ApiResponse(1, "success", null);

@@ -18,21 +18,12 @@ public class CollectionController {
     private final CollectionService collectionService;
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/image/save")
-    public ResponseEntity<?> imageSave(
-            @RequestParam(value = "file", required = false) MultipartFile imageFile
-    ){
-        return ResponseEntity.ok(collectionService.saveImage(imageFile));
-    }
-
     // ADD
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("/add/{userId}")
     public ResponseEntity<?> add(
             @PathVariable(name = "userId") Long userId,
-            @RequestBody CollectionRequestDto collectionRequestDto,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile
+            @RequestBody CollectionRequestDto collectionRequestDto
     ){
 
         return ResponseEntity.ok(collectionService.add(userId, collectionRequestDto));
@@ -73,11 +64,11 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.getUserCollections(userId));
     }
 
-    @GetMapping("/get_by_topic/{topic}")
+    @GetMapping("/get_by_topic/{topicId}")
     public ResponseEntity<?> getByTopic(
-            @PathVariable(name = "topic") String name
+            @PathVariable(name = "topicId") Long id
     ){
-        return ResponseEntity.ok(collectionService.getByTopic(name));
+        return ResponseEntity.ok(collectionService.getByTopic(id));
     }
 
 

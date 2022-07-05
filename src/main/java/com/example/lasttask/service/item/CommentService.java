@@ -7,6 +7,7 @@ import com.example.lasttask.model.entity.CommentEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
+import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,34 +22,14 @@ public class CommentService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
+    private final CheckService checkService;
 
-    private ItemEntity checkItemForExist(Long id){
-        Optional<ItemEntity> optionalItem = itemRepository.findById(id);
-        if (!optionalItem.isPresent()){
-            throw new NotFoundException("Item not found with this Id: " + id);
-        }
-        return optionalItem.get();
-    }
 
-    private UserEntity checkUserForExist(Long userId){
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (!optionalUser.isPresent()){
-            throw new NotFoundException("User not found with this Id: " + userId);
-        }
-        return optionalUser.get();
-    }
 
-    private CommentEntity checkCommentForExist(Long commentId){
-        Optional<CommentEntity> optionalComment = commentRepository.findById(commentId);
-        if (!optionalComment.isPresent()){
-            throw new NotFoundException("Comment not found with this Id: " + commentId);
-        }
-        return optionalComment.get();
-    }
 
     public ApiResponse add(Long userId, Long itemId, CommentRequestDto commentRequestDto) {
-        UserEntity user = checkUserForExist(userId);
-        ItemEntity item = checkItemForExist(itemId);
+        UserEntity user = checkService.checkUserForExist(userId);
+        ItemEntity item = checkService.checkItemForExist(itemId);
         CommentEntity commentEntity = modelMapper.map(commentRequestDto, CommentEntity.class);
         commentEntity.setUser(user);
         commentEntity.setItem(item);
@@ -58,9 +39,9 @@ public class CommentService {
 
 
     public ApiResponse edit(Long userId, Long itemId, Long commentId, CommentRequestDto commentRequestDto) {
-        checkUserForExist(userId);
-        checkItemForExist(itemId);
-        CommentEntity commentEntity = checkCommentForExist(commentId);
+        checkService.checkUserForExist(userId);
+        checkService.checkItemForExist(itemId);
+        CommentEntity commentEntity = checkService.checkCommentForExist(commentId);
 
         commentEntity.setText(commentRequestDto.getText());
         commentRepository.save(commentEntity);
@@ -69,16 +50,16 @@ public class CommentService {
 
 
     public ApiResponse delete(Long userId, Long itemId, Long commentId) {
-        checkUserForExist(userId);
-        checkItemForExist(itemId);
-        checkCommentForExist(commentId);
+        checkService.checkUserForExist(userId);
+        checkService.checkItemForExist(itemId);
+        checkService.checkCommentForExist(commentId);
         commentRepository.deleteById(commentId);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse get(Long userId, Long itemId) {
-        checkUserForExist(userId);
-        checkItemForExist(itemId);
+        checkService.checkUserForExist(userId);
+        checkService.checkItemForExist(itemId);
         return new ApiResponse(1, "success", commentRepository.findAllByItem_Id(itemId));
     }
 }

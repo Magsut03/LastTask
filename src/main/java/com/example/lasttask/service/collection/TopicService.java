@@ -10,6 +10,7 @@ import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.repository.CollectionRepository;
 import com.example.lasttask.repository.TopicRepository;
+import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.expression.spel.ast.OpEQ;
@@ -26,46 +27,26 @@ public class TopicService {
     private final CollectionRepository collectionRepository;
     private final TopicRepository topicRepository;
     private final ModelMapper modelMapper;
+    private final CheckService checkService;
 
-    private void checkTopicForNotExist(String name){
-        Optional<TopicEntity> optionalTopic = topicRepository.findByName(name);
-        if (optionalTopic.isPresent()){
-            throw new NotFoundException("Topic is already exist with this Name: " + name);
-        }
-    }
-
-    private TopicEntity checkTopicForExist(Long id){
-        Optional<TopicEntity> optionalTopic = topicRepository.findById(id);
-        if (!optionalTopic.isPresent()){
-            throw new NotFoundException("Topic not found with this Id: " + id);
-        }
-        return optionalTopic.get();
-    }
-
-    private void checkTopicFordelete(TopicEntity topic){
-        List<CollectionEntity> collectionEntityList = collectionRepository.findByTopicId(topic.getId());
-        if (collectionEntityList.size() > 0){
-            throw new BadRequestException("you can't delete this topic because it is being used with '" + collectionEntityList.get(0).getName() + "' collection");
-        }
-    }
 
     public ApiResponse add(TopicRequestDto topicRequestDto){
-        checkTopicForNotExist(topicRequestDto.getName());
+        checkService.checkTopicForNotExist(topicRequestDto.getName());
         TopicEntity topic = modelMapper.map(topicRequestDto, TopicEntity.class);
         topicRepository.save(topic);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse edit(Long topicId, TopicRequestDto topicRequestDto) {
-        TopicEntity topic = checkTopicForExist(topicId);
+        TopicEntity topic = checkService.checkTopicForExist(topicId);
         topic.setName(topicRequestDto.getName());
         topicRepository.save(topic);
         return new ApiResponse(1, "success", null);
     }
 
     public ApiResponse delete(Long id){
-        TopicEntity topic = checkTopicForExist(id);
-        checkTopicFordelete(topic);
+        TopicEntity topic = checkService.checkTopicForExist(id);
+        checkService.checkTopicFordelete(topic);
         topicRepository.deleteById(id);
         return new ApiResponse(1, "success", null);
     }

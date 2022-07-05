@@ -1,7 +1,7 @@
 package com.example.lasttask.controller.item;
 
-import com.example.lasttask.dto.request.item.IdRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
+import com.example.lasttask.dto.request.item.TagIdRequestDto;
 import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.service.item.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +66,9 @@ public class ItemController{
 
     @GetMapping("/get_by_tags")
     public ResponseEntity<?> getByTags(
-            @RequestBody List<TagRequestDto> tagRequestDtos
+            @RequestBody List<TagIdRequestDto> tagIdRequestDtos
             ) {
-       return ResponseEntity.ok(itemService.getByTags(tagRequestDtos));
+       return ResponseEntity.ok(itemService.getByTags(tagIdRequestDtos));
     }
 
 
