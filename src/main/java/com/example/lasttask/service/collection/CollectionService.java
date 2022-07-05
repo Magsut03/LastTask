@@ -3,31 +3,18 @@ package com.example.lasttask.service.collection;
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
-import com.example.lasttask.exception.BadRequestException;
-import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
 import com.example.lasttask.repository.*;
 import com.example.lasttask.service.CheckService;
-import com.google.cloud.storage.Acl;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
-import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
 
 @Service
 @RequiredArgsConstructor
@@ -37,34 +24,11 @@ public class CollectionService {
     private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
-    private final TopicRepository topicRepository;
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;
     private final CheckService checkService;
 
-    private static Storage storage = StorageOptions.getDefaultInstance().getService();
-    @Value("${google.storage.bucket}")
-    private String bucketName;
-
-    public String saveImage(MultipartFile imageFile){
-        String fileName = System.nanoTime() + imageFile.getOriginalFilename();
-
-        try {
-            BlobInfo blobInfo = storage.create(
-                    BlobInfo.newBuilder(bucketName, fileName)
-                            .setContentType(imageFile.getContentType())
-                            .setAcl(new ArrayList<>(
-                                    Arrays.asList(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER))
-                            )).build(),
-                    imageFile.getInputStream()
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
-    }
 
     public ApiResponse add(Long userId, CollectionRequestDto collectionRequestDto){
         UserEntity user = checkService.checkUserForExist(userId);

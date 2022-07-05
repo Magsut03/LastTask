@@ -23,7 +23,6 @@ import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
 public class CheckService {
 
     private final CollectionRepository collectionRepository;
-    private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
     private final TopicRepository topicRepository;

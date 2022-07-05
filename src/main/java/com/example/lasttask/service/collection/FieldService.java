@@ -2,33 +2,25 @@ package com.example.lasttask.service.collection;
 
 import com.example.lasttask.dto.request.collection.FieldRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.exception.BadRequestException;
-import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.FieldEntity;
-import com.example.lasttask.model.entity.item.ItemFieldEntity;
-import com.example.lasttask.model.enums.RoleEnum;
-import com.example.lasttask.repository.*;
+import com.example.lasttask.repository.FieldRepository;
+import com.example.lasttask.repository.ItemFieldRepository;
 import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
-import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
 
 @RequiredArgsConstructor
 @Service
 public class FieldService {
 
-    private final CollectionRepository collectionRepository;
     private final ItemFieldRepository itemFieldRepository;
     private final FieldRepository fieldRepository;
-    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final CheckService checkService;
 

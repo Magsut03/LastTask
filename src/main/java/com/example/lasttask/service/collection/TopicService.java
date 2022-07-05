@@ -2,29 +2,21 @@ package com.example.lasttask.service.collection;
 
 import com.example.lasttask.dto.request.collection.TopicRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.dto.response.collection.CollectionResponseDto;
 import com.example.lasttask.dto.response.collection.TopicResponseDto;
-import com.example.lasttask.exception.BadRequestException;
-import com.example.lasttask.exception.NotFoundException;
-import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
-import com.example.lasttask.repository.CollectionRepository;
 import com.example.lasttask.repository.TopicRepository;
 import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.expression.spel.ast.OpEQ;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class TopicService {
 
-    private final CollectionRepository collectionRepository;
     private final TopicRepository topicRepository;
     private final ModelMapper modelMapper;
     private final CheckService checkService;

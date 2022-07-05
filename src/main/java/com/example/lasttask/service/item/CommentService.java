@@ -2,25 +2,20 @@ package com.example.lasttask.service.item;
 
 import com.example.lasttask.dto.request.item.CommentRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
-import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.CommentEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
-import com.example.lasttask.repository.*;
+import com.example.lasttask.repository.CommentRepository;
 import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
     private final CheckService checkService;
 

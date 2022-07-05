@@ -3,12 +3,9 @@ package com.example.lasttask.service.item;
 import com.example.lasttask.dto.request.item.ItemFieldRequestDto;
 import com.example.lasttask.dto.request.item.ItemRequestDto;
 import com.example.lasttask.dto.request.item.TagIdRequestDto;
-import com.example.lasttask.dto.request.item.TagRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.item.ItemsResponseDto;
 import com.example.lasttask.dto.response.item.SingleItemResponseDto;
-import com.example.lasttask.exception.BadRequestException;
-import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.TagEntity;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
@@ -21,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static com.example.lasttask.model.enums.RoleEnum.ROLE_ADMIN;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,6 @@ public class ItemService {
     private final ItemFieldRepository itemFieldRepository;
     private final CommentRepository commentRepository;
     private final FieldRepository fieldRepository;
-    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final TagRepository tagRepository;
     private final ModelMapper modelMapper;

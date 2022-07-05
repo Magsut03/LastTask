@@ -6,7 +6,6 @@ import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,7 +19,6 @@ import static com.example.lasttask.model.enums.StateEnum.*;
 public class AdminService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
 
     public ApiResponse changeState(ChangeStateRequestDto changeStateRequestDto){
 
