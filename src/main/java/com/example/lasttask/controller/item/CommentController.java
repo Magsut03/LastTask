@@ -25,7 +25,7 @@ public class CommentController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/edit/{userId}/{itemId}/{commentId}")
+    @PutMapping("/edit/{userId}/{itemId}/{commentId}")
     public ResponseEntity<?> edit(
             @RequestBody CommentRequestDto commentRequestDto,
             @PathVariable(name = "userId") Long userId,
@@ -36,7 +36,7 @@ public class CommentController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/delete/{userId}/{itemId}/{commentId}")
+    @DeleteMapping("/delete/{userId}/{itemId}/{commentId}")
     public ResponseEntity<?> delete(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "itemId") Long itemId,

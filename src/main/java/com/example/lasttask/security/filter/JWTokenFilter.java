@@ -22,17 +22,12 @@ public class JWTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    try {
       String token = getTokenFromHeader(request);
 
       if (token != null) {
-        jwtTokenProvider.claimProvider(token, request);
+        jwtTokenProvider.claimProvider(token, request, response, filterChain);
       }
-    }
-    catch(JwtValidationException ex){
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    }
-    filterChain.doFilter(request, response);
+      filterChain.doFilter(request, response);
   }
 
 

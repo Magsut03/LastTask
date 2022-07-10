@@ -15,13 +15,13 @@ public class AdminController {
     private final AdminService adminService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/change_role/{userId}")
+    @PutMapping("/change_role/{userId}")
     public ResponseEntity<?> changeRole(@PathVariable(name = "userId") Long userId){
         return ResponseEntity.ok(adminService.changeRole(userId));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/change_state")
+    @PutMapping("/change_state")
     public ResponseEntity<?> changeState(@RequestBody ChangeStateRequestDto changeStateRequestDto){
         return ResponseEntity.ok(adminService.changeState(changeStateRequestDto));
     }

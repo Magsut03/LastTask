@@ -17,7 +17,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity(name = "items")
-public class ItemEntity {
+public class
+ItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

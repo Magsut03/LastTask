@@ -48,6 +48,14 @@ public class CheckService {
         return optionalUser.get();
     }
 
+    public UserEntity checkUserForExistByEmail(String email){
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
+        if (!optionalUser.isPresent()){
+            throw new NotFoundException("User not found with this Email: " + email);
+        }
+        return optionalUser.get();
+    }
+
 
 
 
@@ -171,7 +179,11 @@ public class CheckService {
     }
 
 
-
-
-
+    public TagEntity checkTagForExistByName(String name) {
+        Optional<TagEntity> optionalTagEntity = tagRepository.findByName(name);
+        if (!optionalTagEntity.isPresent()){
+            throw new BadRequestException("Tag not found with this Name: " + name);
+        }
+        return optionalTagEntity.get();
+    }
 }

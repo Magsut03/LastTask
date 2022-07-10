@@ -5,6 +5,7 @@ import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.exception.NotFoundException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.repository.UserRepository;
+import com.example.lasttask.service.CheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,33 +20,30 @@ import static com.example.lasttask.model.enums.StateEnum.*;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final CheckService checkService;
 
     public ApiResponse changeState(ChangeStateRequestDto changeStateRequestDto){
 
-        Optional<UserEntity> optionalUser = userRepository.findById(changeStateRequestDto.getUserId());
-        if (!optionalUser.isPresent()){
-            throw new NotFoundException("user not found with this Id: " + changeStateRequestDto.getUserId());
-        }
-        UserEntity user = optionalUser.get();
-        switch (changeStateRequestDto.getState()){
-            case 0: {
-                user.setState(ACTIVE);
-                break;
+        changeStateRequestDto.getUserIdList().forEach(userId -> {
+            UserEntity user = checkService.checkUserForExist(userId);
+            switch (changeStateRequestDto.getState()){
+                case 0: {
+                    user.setState(ACTIVE);
+                    break;
+                }
+                case 1: {
+                    user.setState(BLOCKED);
+                    break;
+                }
+                case 2: {
+                    user.setState(DELETED);
+                    break;
+                }
             }
-            case 1: {
-                user.setState(BLOCKED);
-                break;
-            }
-            case 2: {
-                user.setState(DELETED);
-                break;
-            }
-        }
-        userRepository.save(user);
+            userRepository.save(user);
+        });
         return new ApiResponse(1, "Successfully!", null);
     }
-
-
 
 
 

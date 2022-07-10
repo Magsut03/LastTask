@@ -49,10 +49,10 @@ public class ItemService {
         checkService.checkPermission(userId, user, collection, "add");
 
         ItemEntity item = new ItemEntity();
-        item.setName((String) itemRequestDto.getFieldList().get(0).getData());
+        item.setName(itemRequestDto.getItemName());
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            TagEntity tag = checkService.checkTagForExist(tagRequestDto.getId());
+            TagEntity tag = checkService.checkTagForExistByName(tagRequestDto.getName());
             tagList.add(tag);
         });
         item.setTagList(tagList);
@@ -64,7 +64,7 @@ public class ItemService {
         List<FieldEntity> fieldEntities = fieldRepository.findByCollectionId(collectionId);
         for (int i = 0; i < fieldEntities.size(); i++){
             FieldEntity fieldEntity = fieldEntities.get(i);
-            ItemFieldRequestDto itemFieldRequestDto = itemRequestDto.getFieldList().get(i + 1);
+            ItemFieldRequestDto itemFieldRequestDto = itemRequestDto.getFieldList().get(i);
             ItemFieldEntity itemFieldEntity = new ItemFieldEntity();
             itemFieldEntity.setData((String) itemFieldRequestDto.getData());
             itemFieldEntity.setItem(item);
@@ -85,7 +85,7 @@ public class ItemService {
 
         List<TagEntity> tagList = new ArrayList<>();
         itemRequestDto.getTagList().forEach(tagRequestDto -> {
-            TagEntity tag = checkService.checkTagForExist(tagRequestDto.getId());
+            TagEntity tag = checkService.checkTagForExistByName(tagRequestDto.getName());
             tagList.add(tag);
         });
         item.setTagList(tagList);
@@ -96,7 +96,7 @@ public class ItemService {
             FieldEntity fieldEntity = fieldEntities.get(i);
             ItemFieldRequestDto itemFieldRequestDto = itemRequestDto.getFieldList().get(i + 1);
 
-            Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityId(fieldEntity.getId());
+            Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityIdAndAndItem_Id(fieldEntity.getId(), itemId);
             ItemFieldEntity itemFieldEntity;
             if (!optionalItemField.isPresent()){
                 itemFieldEntity = new ItemFieldEntity();
@@ -134,10 +134,11 @@ public class ItemService {
     public ApiResponse getById(Long collectionId, Long itemId){
         checkService.checkCollectionForExist(collectionId);
         ItemEntity item = checkService.checkItemForExist(itemId);
+
         List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
         List<FieldEntity> fieldEntityList = fieldRepository.findByCollectionId(collectionId);
         fieldEntityList.forEach(fieldEntity -> {
-            Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityId(fieldEntity.getId());
+            Optional<ItemFieldEntity> optionalItemField = itemFieldRepository.findByFieldEntityIdAndAndItem_Id(fieldEntity.getId(), itemId);
             if (optionalItemField.isPresent()){
                 itemFieldEntityList.add(optionalItemField.get());
             } else {

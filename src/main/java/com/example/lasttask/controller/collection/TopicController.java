@@ -23,7 +23,7 @@ public class TopicController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/edit/{topicId}")
+    @PutMapping("/edit/{topicId}")
     public ResponseEntity<?> delete(
             @PathVariable(name = "topicId") Long topicId,
             @RequestBody TopicRequestDto topicRequestDto
@@ -32,7 +32,7 @@ public class TopicController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/delete/{topicId}")
+    @DeleteMapping("/delete/{topicId}")
     public ResponseEntity<?> delete(@PathVariable(name = "topicId") Long topicId){
         return ResponseEntity.ok(topicService.delete(topicId));
     }

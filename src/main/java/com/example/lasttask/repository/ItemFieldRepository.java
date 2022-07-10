@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface ItemFieldRepository extends JpaRepository<ItemFieldEntity, Long> {
 
-    Optional<ItemFieldEntity> findByFieldEntityId(Long id);
+    Optional<ItemFieldEntity> findByFieldEntityIdAndAndItem_Id(Long fieldEntityId, Long itemId);
 
     @Modifying
     @Transactional

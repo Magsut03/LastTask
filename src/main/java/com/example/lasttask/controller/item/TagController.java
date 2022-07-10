@@ -22,8 +22,8 @@ public class TagController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    @PostMapping("/edit/{tagId}")
-    public ResponseEntity<?> delete(
+    @PutMapping("/edit/{tagId}")
+    public ResponseEntity<?> edit(
             @PathVariable(name = "tagId") Long tagId,
             @RequestBody TagRequestDto tagRequestDto
     ){
@@ -31,8 +31,8 @@ public class TagController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    @PostMapping("/delete/{tagId}")
-    public ResponseEntity<?> delete(@PathVariable(name = "tagId") Long tagId){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable(name = "id") Long tagId){
         return ResponseEntity.ok(tagService.delete(tagId));
     }
 

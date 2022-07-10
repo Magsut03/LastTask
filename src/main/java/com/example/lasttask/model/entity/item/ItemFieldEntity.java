@@ -27,7 +27,7 @@ public class ItemFieldEntity {
     @JsonIgnore
     private ItemEntity item;
 
-    @OneToOne
+    @ManyToOne
     @JsonIgnore
     private FieldEntity fieldEntity;
 

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/field")
@@ -25,7 +27,7 @@ public class FieldController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/delete/{userId}/{collectionId}/{fieldId}")
+    @DeleteMapping("/delete/{userId}/{collectionId}/{fieldId}")
     public ResponseEntity<?> delete(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,

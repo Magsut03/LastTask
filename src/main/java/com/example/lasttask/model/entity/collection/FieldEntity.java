@@ -24,15 +24,8 @@ public class FieldEntity {
     @Column(nullable = false)
     private String name;
 
-    /**
-     * swicht(type)
-     * case 0: Integer
-     * case 1: String
-     * case 2: Date
-     * case 3: Boolean
-     */
     @Column(nullable = false)
-    private int type;
+    private String type;
 
     @Column(nullable = false)
     private LocalDateTime createDate;

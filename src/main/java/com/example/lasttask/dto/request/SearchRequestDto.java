@@ -1,16 +1,14 @@
-package com.example.lasttask.dto.request.collection;
+package com.example.lasttask.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class FieldRequestDto {
-    private String name;
-    private String type;
+public class SearchRequestDto {
+    private String text;
 }
-

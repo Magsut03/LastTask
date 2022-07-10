@@ -1,6 +1,8 @@
 package com.example.lasttask.controller.collection;
 
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
+import com.example.lasttask.dto.response.collection.CollectionResponseDto;
+import com.example.lasttask.model.entity.collection.CollectionEntity;
 import com.example.lasttask.service.collection.CollectionService;
 import com.example.lasttask.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.io.ICsvWriter;
+import org.supercsv.prefs.CsvPreference;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+import static org.supercsv.prefs.CsvPreference.STANDARD_PREFERENCE;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +43,7 @@ public class CollectionController {
 
     // EDIT
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/edit/{userId}/{collectionId}")
+    @PutMapping("/edit/{userId}/{collectionId}")
     public ResponseEntity<?> edit(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
@@ -42,7 +54,7 @@ public class CollectionController {
 
     // DELETE
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/delete/{userId}/{collectionId}")
+    @DeleteMapping("/delete/{userId}/{collectionId}")
     public ResponseEntity<?> delete(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId
@@ -70,6 +82,15 @@ public class CollectionController {
     ){
         return ResponseEntity.ok(collectionService.getByTopic(id));
     }
+
+
+    @GetMapping("/export/{collectionId}")
+    public void exportToCSV(HttpServletResponse response, @PathVariable(name = "collectionId") Long collectionId) {
+        collectionService.exportToCSV(response, collectionId);
+    }
+
+
+
 
 
 }

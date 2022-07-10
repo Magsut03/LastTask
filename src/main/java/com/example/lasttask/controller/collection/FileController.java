@@ -13,8 +13,8 @@ public class FileController {
 
     private final FileService fileService;
 
-//    @PostMapping("/profile/pic")
-//    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile multipartFile) {
-//        return ResponseEntity.ok(fileService.upload(multipartFile));
-//    }
+    @PostMapping("/profile/pic")
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile multipartFile) {
+        return ResponseEntity.ok(fileService.upload(multipartFile));
+    }
 }

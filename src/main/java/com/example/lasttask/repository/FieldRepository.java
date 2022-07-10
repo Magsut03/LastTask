@@ -1,6 +1,7 @@
 package com.example.lasttask.repository;
 
 import com.example.lasttask.model.entity.collection.FieldEntity;
+import com.google.cloud.firestore.v1.FirestoreAdminClient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
 
+
     List<FieldEntity> findByCollectionId(Long collectionId);
 
     Optional<FieldEntity> findByName(String name);
@@ -20,5 +22,7 @@ public interface FieldRepository extends JpaRepository<FieldEntity, Long> {
     @Query(value = "delete from field f " +
             "where f.collection_id = ?1 ", nativeQuery = true)
     void deleteAllByCollectionId(Long collectionId);
+
+    List<FieldEntity> findAllByCollection_IdOrderByCreateDateAsc(Long collectionId);
 }
 

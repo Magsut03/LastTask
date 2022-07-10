@@ -29,7 +29,7 @@ public class ItemController{
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/edit/{userId}/{collectionId}/{itemId}")
+    @PutMapping("/edit/{userId}/{collectionId}/{itemId}")
     public ResponseEntity<?> edit(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,
@@ -40,7 +40,7 @@ public class ItemController{
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    @PostMapping("/delete/{userId}/{collectionId}/{itemId}")
+    @DeleteMapping("/delete/{userId}/{collectionId}/{itemId}")
     public ResponseEntity<?> delete(
             @PathVariable(name = "userId") Long userId,
             @PathVariable(name = "collectionId") Long collectionId,

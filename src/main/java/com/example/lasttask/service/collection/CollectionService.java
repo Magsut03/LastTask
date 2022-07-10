@@ -3,18 +3,33 @@ package com.example.lasttask.service.collection;
 import com.example.lasttask.dto.request.collection.CollectionRequestDto;
 import com.example.lasttask.dto.response.ApiResponse;
 import com.example.lasttask.dto.response.collection.CollectionResponseDto;
+import com.example.lasttask.exception.BadRequestException;
+import com.example.lasttask.exception.file.FileProcessingException;
 import com.example.lasttask.model.entity.UserEntity;
 import com.example.lasttask.model.entity.collection.CollectionEntity;
+import com.example.lasttask.model.entity.collection.FieldEntity;
 import com.example.lasttask.model.entity.collection.TopicEntity;
 import com.example.lasttask.model.entity.item.ItemEntity;
+import com.example.lasttask.model.entity.item.ItemFieldEntity;
 import com.example.lasttask.repository.*;
 import com.example.lasttask.service.CheckService;
+import com.example.lasttask.util.CSVUtil;
+import com.opencsv.CSVWriter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.expression.spel.ast.OpAnd;
 import org.springframework.stereotype.Service;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+
+import static org.supercsv.prefs.CsvPreference.STANDARD_PREFERENCE;
 
 @Service
 @RequiredArgsConstructor
@@ -118,4 +133,51 @@ public class CollectionService {
         });
         return new ApiResponse(1, "success", collectionResponseDtoList);
     }
+
+
+
+
+    public void exportToCSV(HttpServletResponse response, Long collectionId) {
+
+        CollectionEntity collection = checkService.checkCollectionForExist(collectionId);
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=" + collection.getName() + ".csv");
+        List<String[]> collectionCSV = collection.toCSVString();
+
+
+        try (CSVWriter csvWriter = new CSVWriter(response.getWriter())){
+            for (String[] strings : collectionCSV) {
+                csvWriter.writeNext(strings);
+            }
+            List<FieldEntity> fieldList = fieldRepository.findAllByCollection_IdOrderByCreateDateAsc(collectionId);
+            List<ItemEntity> itemEntityList = itemRepository.findByCollectionId(collectionId);
+
+            List<String[]> list = CSVUtil.collectionItemFieldNameLists(fieldList);
+            for (String[] strings : list) {
+                csvWriter.writeNext(strings);
+            }
+
+            for (ItemEntity item : itemEntityList) {
+                List<ItemFieldEntity> itemFieldEntityList = new ArrayList<>();
+                for (FieldEntity fieldEntity : fieldList) {
+                    Optional<ItemFieldEntity> optionalItemField =
+                            itemFieldRepository.findByFieldEntityIdAndAndItem_Id(fieldEntity.getId(), item.getId());
+                    if (!optionalItemField.isPresent()){
+                        throw new BadRequestException("Item Field not found");
+                    }
+                    itemFieldEntityList.add(optionalItemField.get());
+                }
+                List<String[]> csvContent = CSVUtil.valuesCollectionItemFields(item, itemFieldEntityList, fieldList.size());
+                for (String[] strings : csvContent) {
+                    csvWriter.writeNext(strings);
+                }
+            }
+        } catch (IOException e) {
+            throw new FileProcessingException("csv file creation error");
+        }
+
+    }
+
+
+
 }

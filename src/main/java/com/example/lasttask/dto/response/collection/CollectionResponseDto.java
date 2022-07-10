@@ -16,3 +16,4 @@ public class CollectionResponseDto {
     private String description;
     private String imageUrl;
 }
+

@@ -1,3 +1,6 @@
+
+
+
 -- for collection --
 alter table collection add column doc tsvector;
 
@@ -24,6 +27,9 @@ create trigger coll_tsvektor_update
 
 
 
+
+
+
 -- for item --
 alter table items add column doc tsvector;
 
@@ -44,6 +50,13 @@ create trigger item_tsvektor_update
                          on items
                          for each row
                          execute procedure item_tsvektor_trigger();
+
+
+
+
+
+
+
 
 
 

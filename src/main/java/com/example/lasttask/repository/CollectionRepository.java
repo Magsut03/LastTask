@@ -5,6 +5,7 @@ import com.example.lasttask.model.entity.collection.CollectionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.transaction.Transactional;
@@ -21,4 +22,8 @@ public interface CollectionRepository extends JpaRepository<CollectionEntity, Lo
 
 
     List<CollectionEntity> findByTopicId(Long topicId);
+
+    @Query(value = "select * from collection c where c.doc @@ plainto_tsquery(:text)", nativeQuery = true)
+    List<CollectionEntity> search(String text);
+
 }

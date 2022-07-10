@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ItemRequestDto {
+    private String itemName;
     private List<ItemFieldRequestDto> fieldList;
-    private List<TagIdRequestDto> tagList;
+    private List<TagRequestDto> tagList;
 }
